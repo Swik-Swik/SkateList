@@ -1,0 +1,59 @@
+[
+  {
+    "title": "Ollie",
+    "path": "../videos/trick.mov",
+    "types": ["NORMAL"],
+    "dateAndPlace": [
+      { "date": "2023-01-02", "place": "Mougins" },
+      { "date": "2023-15-02", "place": "Cannes" }
+    ]
+  },
+  {
+    "title": "Nollie",
+    "path": "../videos/trick.mov",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [
+      { "date": "2023-01-02", "place": "Mougins" },
+      { "date": "2023-15-02", "place": "Cannes" }
+    ]
+  },
+  {
+    "title": "Fakie Ollie",
+    "path": "../videos/trick.mov",
+    "types": ["FAKIE"],
+    "dateAndPlace": [
+      { "date": "2023-01-02", "place": "Mougins" },
+      { "date": "2023-15-02", "place": "Cannes" }
+    ]
+  },
+  {
+    "title": "Switch ollie",
+    "path": "../videos/trick.mov",
+    "types": ["SWITCH"],
+    "dateAndPlace": [
+      { "date": "2023-01-02", "place": "Mougins" },
+      { "date": "2023-15-02", "place": "Cannes" }
+    ]
+  },
+  {
+    "title": "Kickflip ",
+    "path": "../videos/ticks1.mp4",
+    "types": ["NORMAL", "SPINE"],
+    "dateAndPlace": [
+      { "date": "2023-01-02", "place": "Mougins" },
+      { "date": "2023-15-02", "place": "Cannes" }
+    ]
+  },
+  {
+    "title": "new titre sa mere",
+    "path": "../videos/ticks1.mp4",
+    "types": ["TRICKS", "321576"],
+    "dateAndPlace": []
+  },
+  {
+    "title": "360 Flip",
+    "path": "../videos/ticks1.mp4",
+    "types": ["TRICKS", "321576"],
+    "dateAndPlace": []
+  }
+]

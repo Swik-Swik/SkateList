@@ -1,0 +1,8 @@
+#nav-bar a {
+  display: block;
+}
+
+#search-bar {
+  display: block;
+  margin-bottom: 10px;
+}

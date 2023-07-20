@@ -1,0 +1,7 @@
+1 : la video en plus grand de base 
+2 : le text en list 
+3 : les date a la fin 
+4 : la date de la video en 1ere date 
+5 : le titre dans la case de la video
+6 : moins d espace dans le menu a gauche 
+ 
