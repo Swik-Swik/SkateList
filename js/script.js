@@ -69,7 +69,7 @@ fetch("json/videos.json")
       });
     });
   })
-  .then(
+  .then(() => {
     fetch("json/todo.json")
       .then((response) => response.json())
       .then((todoTricks) => {
@@ -81,5 +81,5 @@ fetch("json/videos.json")
           navItem.textContent = tricks.name;
           navBar.appendChild(navItem);
         });
-      })
-  );
+      });
+  });
