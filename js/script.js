@@ -12,7 +12,9 @@ fetch("json/videos.json")
       title.textContent = video.title;
       title.classList.add("video-title");
 
-      const videoElem = document.createElement("video");
+      const videoElem = document.createElement("iframe");
+      videoElem.width = "420";
+      videoElem.height = "315";
       videoElem.src = video.path;
       videoElem.classList.add("video-style");
       videoElem.controls = true;

@@ -199,169 +199,169 @@
   },
   {
     "title": "Kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Nollie kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NOLLIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Switch kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["SWITCH", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Double kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie double kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "180 Backside kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie 180 Backside kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie 180 Frontside kickflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Varial flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Nollie varial flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NOLLIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie varial flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Switch varial flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["SWITCH", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "360 flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie 360 flip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Varial heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie varial heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie frontside heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Casper heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie casper heelflip",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Backside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NORMAL", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Nollie backside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NOLLIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie backside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Switch backside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["SWITCH", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Nollie frontside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["NOLLIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
     "title": "Fakie frontside bigspin",
-    "path": "../videos/ticks1.mp4",
+    "path": "../videos/trick.mov",
     "types": ["FAKIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   }
