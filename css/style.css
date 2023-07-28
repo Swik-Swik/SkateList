@@ -1,26 +1,30 @@
-#main {
+body {
+  padding-top: 70px;
+}
+
+/* #main {
   display: grid;
   grid-template-rows: auto 1fr;
-}
+} */
 
-#search-bar {
+/* #search-bar {
   position: sticky;
   top: 0;
-}
+} */
 
-#nav-and-content {
-  display: grid;
-  grid-template-columns: 40% 60%;
-}
+/* #nav-and-content { */
+/* display: grid; */
+/* grid-template-columns: 40% 60%; */
+/* } */
 
-#trick-list {
+/* #trick-list {
   grid-column: 1;
-}
+} */
 
-#content {
+/* #content {
   grid-column: 2;
-}
-
+} */
+/* 
 body {
   font-family: "Lato", sans-serif;
   display: grid;
@@ -37,10 +41,10 @@ body {
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
-}
+} */
 
 /* Position and style the close button (top right corner) */
-.sidebar .closebtn {
+/* .sidebar .closebtn {
   position: absolute;
   top: 0;
   right: 25px;
@@ -114,7 +118,7 @@ body {
 .video-group {
   border: 1px solid black;
   display: inline-flex;
-  /* flex-direction: column; */
+  flex-direction: column;
   align-items: center;
 }
 
@@ -145,4 +149,4 @@ body {
 
 .padding_top {
   margin-top: 100px;
-}
+} */

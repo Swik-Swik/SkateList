@@ -2,55 +2,65 @@
 fetch("json/videos.json")
   .then((response) => response.json())
   .then((videos) => {
-    const navBar = document.querySelector("#trick-list");
     const content = document.querySelector("#content");
 
-    console.log(JSON.stringify(videos));
+    // console.log(JSON.stringify(videos));
     // Display each video
     videos.forEach((video) => {
-      const title = document.createElement("h2");
-      title.textContent = video.title;
-      title.classList.add("video-title");
-
-      const videoElem = document.createElement("iframe");
-      videoElem.width = "420";
-      videoElem.height = "315";
-      videoElem.src = video.path;
-      videoElem.classList.add("video-style");
-      videoElem.controls = true;
-
-      const datePlace = document.createElement("p");
-      datePlace.textContent = video.dateAndPlace
-        .map((dp) => `${dp.date}, ${dp.place}`)
-        .join(" | ");
-      datePlace.classList.add("video-dateplace-info");
-
-      const types = document.createElement("p");
-      types.textContent = video.types.join(", ");
-      types.classList.add("video-tricktype-info");
+      // Add to drop down toggle
+      const trickDoneLi = document.createElement("li");
+      const dropItem = document.createElement("a");
+      dropItem.textContent = video.title;
+      dropItem.href = "#" + video.title;
+      trickDoneLi.appendChild(dropItem);
+      const dropDown = document.querySelector("#dropdown-done");
+      dropDown.appendChild(trickDoneLi);
 
       // Group video and its information
-      const videoGroup = document.createElement("div");
-      videoGroup.classList.add("video-group");
-      videoGroup.appendChild(videoElem);
-      videoGroup.appendChild(datePlace);
-      videoGroup.appendChild(types);
+      // iframe
+      const videoElem = document.createElement("iframe");
+      videoElem.height = "240";
+      height = videoElem.src = video.path;
 
-      // Add to nav bar
-      const navItem = document.createElement("a");
-      navItem.textContent = video.title;
-      navItem.href = "#" + video.title;
-      navBar.appendChild(navItem);
+      // Create card div
+      const cardDiv = document.createElement("div");
+      cardDiv.classList.add("card");
+      cardDiv.classList.add("h-100");
 
-      // Add to content
-      const videoContainer = document.createElement("div");
-      videoContainer.id = video.title;
-      videoContainer.appendChild(title);
-      videoContainer.appendChild(videoGroup);
-      content.appendChild(videoContainer);
+      // Create col div
+      const colDiv = document.createElement("div");
+      colDiv.classList.add("col");
+
+      // Select tricksCards
+      const tricksCards = document.querySelector("#tricksCards");
+
+      // Card Body
+      // create card body
+      const cardBody = document.createElement("div");
+      cardBody.classList.add("card-body");
+
+      // mettre le titre dans la card body
+      const title = document.createElement("h2");
+      title.textContent = video.title;
+      title.classList.add("card-title");
+
+      // mettre les type dans le card body
+      const types = document.createElement("p");
+      types.textContent = video.types.join(", ");
+      types.classList.add("card-text");
+
+      // Populate
+      cardBody.appendChild(title);
+      // cardBody.appendChild(datePlace);
+      cardBody.appendChild(types);
+      cardDiv.appendChild(videoElem);
+      cardDiv.appendChild(cardBody);
+      colDiv.appendChild(cardDiv);
+      tricksCards.appendChild(colDiv);
     });
 
     // Add event listener for search bar
+
     const searchBar = document.querySelector("#search-bar");
     searchBar.addEventListener("keyup", (event) => {
       const query = event.target.value.toLowerCase();
@@ -63,6 +73,7 @@ fetch("json/videos.json")
         const types = videoContainer
           .querySelector(".video-tricktype-info")
           .textContent.toLowerCase();
+
         const isMatchingTitle = title.includes(query);
         const isMatchingTypes = types.includes(query);
 
@@ -70,18 +81,18 @@ fetch("json/videos.json")
           isMatchingTitle || isMatchingTypes ? "block" : "none";
       });
     });
-  })
-  .then(() => {
-    fetch("json/todo.json")
-      .then((response) => response.json())
-      .then((todoTricks) => {
-        const navBar = document.querySelector("#trick-list");
-        // Display each video
-        todoTricks.forEach((tricks) => {
-          // Add to nav bar
-          const navItem = document.createElement("p");
-          navItem.textContent = tricks.name;
-          navBar.appendChild(navItem);
-        });
-      });
+  });
+fetch("json/todo.json")
+  .then((response) => response.json())
+  .then((todoTricks) => {
+    // Display each todo trick
+    todoTricks.forEach((tricks) => {
+      // Add to Drop down list
+      const trickTodoLi = document.createElement("li");
+      const dropTodoItem = document.createElement("p");
+      dropTodoItem.textContent = tricks.name;
+      trickTodoLi.appendChild(dropTodoItem);
+      const dropDown = document.querySelector("#dropdown-todo");
+      dropDown.appendChild(trickTodoLi);
+    });
   });
