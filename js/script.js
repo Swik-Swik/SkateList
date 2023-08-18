@@ -11,7 +11,7 @@ fetch("json/videos.json")
       const trickDoneLi = document.createElement("li");
       const dropItem = document.createElement("a");
       dropItem.textContent = video.title;
-      // dropItem.href = "#" + video.title;
+      dropItem.href = "#" + video.title;
       trickDoneLi.appendChild(dropItem);
       const dropDown = document.querySelector("#dropdown-done");
       dropDown.appendChild(trickDoneLi);
@@ -85,6 +85,7 @@ fetch("json/videos.json")
       cardDiv.appendChild(videoOrPicture);
       cardDiv.appendChild(cardBody);
       colDiv.appendChild(cardDiv);
+      colDiv.id = video.title;
       tricksCards.appendChild(colDiv);
     });
 
