@@ -11,17 +11,47 @@ fetch("json/videos.json")
       const trickDoneLi = document.createElement("li");
       const dropItem = document.createElement("a");
       dropItem.textContent = video.title;
-      dropItem.href = "#" + video.title;
+      // dropItem.href = "#" + video.title;
       trickDoneLi.appendChild(dropItem);
       const dropDown = document.querySelector("#dropdown-done");
       dropDown.appendChild(trickDoneLi);
 
       // Group video and its information
-      // iframe
-      const videoElem = document.createElement("iframe");
-      videoElem.height = "240";
-      height = videoElem.src = video.path;
-
+      // iframe or piture if no video
+      let videoOrPicture;
+      const trickImage = document.createElement("img");
+      trickImage.height = "240";
+      trickImage.width = "150";
+      if (video.path == "") {
+        console.log(video.types[0]);
+        switch (video.types[0]) {
+          case "NORMAL":
+            console.log("velo10");
+            trickImage.src = "../images/normal.jpg";
+            break;
+          case "NOLLIE":
+            console.log("veloKKKK");
+            trickImage.src = "../images/nollie.jpg";
+            break;
+          case "FAKIE":
+            trickImage.src = "../images/fakie.jpg";
+            break;
+          case "SWITCH":
+            trickImage.src = "../images/switch.jpg";
+            break;
+          default:
+            trickImage.src = "../images/unknown.jpg";
+        }
+        videoOrPicture = trickImage;
+      } else {
+        const videoElem = document.createElement("iframe");
+        videoElem.height = "240";
+        height = videoElem.src =
+          "https://www.youtube.com/embed/" +
+          video.path +
+          "?mute=1&controls=0&playlist=e_8rvaAQJyU&loop=1";
+        videoOrPicture = videoElem;
+      }
       // Create card div
       const cardDiv = document.createElement("div");
       cardDiv.classList.add("card");
@@ -52,7 +82,7 @@ fetch("json/videos.json")
       // Populate
       cardBody.appendChild(title);
       cardBody.appendChild(types);
-      cardDiv.appendChild(videoElem);
+      cardDiv.appendChild(videoOrPicture);
       cardDiv.appendChild(cardBody);
       colDiv.appendChild(cardDiv);
       tricksCards.appendChild(colDiv);
