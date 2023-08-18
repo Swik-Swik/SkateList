@@ -2,7 +2,7 @@
 fetch("json/videos.json")
   .then((response) => response.json())
   .then((videos) => {
-    const content = document.querySelector("#content");
+    const content = document.querySelector("#tricksCards");
 
     // console.log(JSON.stringify(videos));
     // Display each video
@@ -51,7 +51,6 @@ fetch("json/videos.json")
 
       // Populate
       cardBody.appendChild(title);
-      // cardBody.appendChild(datePlace);
       cardBody.appendChild(types);
       cardDiv.appendChild(videoElem);
       cardDiv.appendChild(cardBody);
@@ -60,28 +59,25 @@ fetch("json/videos.json")
     });
 
     // Add event listener for search bar
-
     const searchBar = document.querySelector("#search-bar");
     searchBar.addEventListener("keyup", (event) => {
       const query = event.target.value.toLowerCase();
       const videoContainers = Array.from(content.children);
-
       videoContainers.forEach((videoContainer) => {
         const title = videoContainer
-          .querySelector(".video-title")
+          .querySelector(".card-title")
           .textContent.toLowerCase();
         const types = videoContainer
-          .querySelector(".video-tricktype-info")
+          .querySelector(".card-text")
           .textContent.toLowerCase();
-
         const isMatchingTitle = title.includes(query);
         const isMatchingTypes = types.includes(query);
-
         videoContainer.style.display =
           isMatchingTitle || isMatchingTypes ? "block" : "none";
       });
     });
   });
+
 fetch("json/todo.json")
   .then((response) => response.json())
   .then((todoTricks) => {
