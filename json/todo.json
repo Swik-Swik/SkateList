@@ -18,6 +18,24 @@
     "name": "Switch heelfip"
   },
   {
-    "name": "Nollie heelfilp"
+    "name": "Nollie heelfip"
+  },
+  {
+    "name": "Fronrside 360"
+  },
+  {
+    "name": "Fakie Fronrside 360"
+  },
+  {
+    "name": "Nollie Fronrside 360"
+  },
+  {
+    "name": "Backside 360"
+  },
+  {
+    "name": "Fakie Backside 360"
+  },
+  {
+    "name": "Nollie Backside 360"
   }
 ]
