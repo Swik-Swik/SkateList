@@ -49,7 +49,7 @@ fetch("json/videos.json")
         height = videoElem.src =
           "https://www.youtube.com/embed/" +
           video.path +
-          "?mute=1&controls=0&playlist=e_8rvaAQJyU&loop=1";
+          "?mute=1&controls=0&loop=1";
         videoOrPicture = videoElem;
       }
       // Create card div
