@@ -24,42 +24,6 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Ollie Fronside pivot",
-    "path": "",
-    "types": ["NORMAL", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Ollie Backside pivot",
-    "path": "",
-    "types": ["NORMAL", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Fakie ollie Fronside pivot",
-    "path": "",
-    "types": ["FAKIE", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Fakie ollie Backside pivot",
-    "path": "",
-    "types": ["FAKIE", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Switch ollie Fronside pivot",
-    "path": "",
-    "types": ["SWITCH", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Switch ollie Backside pivot",
-    "path": "",
-    "types": ["SWITCH", "PIVOT"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
     "title": "Frontside Pop Shov-it",
     "path": "",
     "types": ["NORMAL"],
@@ -105,36 +69,6 @@
     "title": "Switch backside Pop Shov-it",
     "path": "",
     "types": ["SWITCH"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Backside Pop Shov-it body varial",
-    "path": "",
-    "types": ["NORMAL"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Nollie backside Pop Shov-it body varial",
-    "path": "",
-    "types": ["NOLLIE"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Fakie backside Pop Shov-it body varial",
-    "path": "",
-    "types": ["FAKIE"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Switch backside Pop Shov-it body varial",
-    "path": "",
-    "types": ["SWITCH"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
-    "title": "Backside Pop Shov-it frontside pivot",
-    "path": "",
-    "types": ["NORMAL", "PIVOT"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
@@ -363,6 +297,72 @@
     "title": "Fakie frontside bigspin",
     "path": "",
     "types": ["FAKIE", "ROTATION"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Ollie Fronside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Ollie Backside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Fakie ollie Fronside pivot",
+    "path": "",
+    "types": ["FAKIE", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Fakie ollie Backside pivot",
+    "path": "",
+    "types": ["FAKIE", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Switch ollie Fronside pivot",
+    "path": "",
+    "types": ["SWITCH", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Switch ollie Backside pivot",
+    "path": "",
+    "types": ["SWITCH", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Backside Pop Shov-it frontside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Backside Pop Shov-it body varial",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Nollie backside Pop Shov-it body varial",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Fakie backside Pop Shov-it body varial",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Switch backside Pop Shov-it body varial",
+    "path": "",
+    "types": ["SWITCH"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   }
 ]
