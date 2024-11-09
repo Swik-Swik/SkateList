@@ -12,10 +12,16 @@
     "name": "Nollie Frontside Flip"
   },
   {
+    "name": "Nollie Frontside Pivot"
+  },
+  {
+    "name": "Nollie Backside Pivot"
+  },
+  {
     "name": "Nollie backside pop shov it frontside pivot"
   },
   {
-    "name": "Fackie backside pop shov it frontside pivot"
+    "name": "Fakie backside pop shov it frontside pivot"
   },
   {
     "name": "Switch backside pop shov it frontside pivot"
@@ -24,7 +30,7 @@
     "name": "Nollie Fronside pop shov it backside pivot"
   },
   {
-    "name": "Fackie Fronside pop shov it backside pivot"
+    "name": "Fakie Fronside pop shov it backside pivot"
   },
   {
     "name": "360 Frontside pop shov it"
