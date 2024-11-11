@@ -1,143 +1,106 @@
 [
-  {
-    "name": "Frontside Flip"
-  },
-  {
-    "name": "Fakie Frontside Flip"
-  },
-  {
-    "name": "Switch Frontside Flip"
-  },
-  {
-    "name": "Nollie Frontside Flip"
-  },
-  {
-    "name": "Nollie Frontside Pivot"
-  },
-  {
-    "name": "Nollie Backside Pivot"
-  },
-  {
-    "name": "Nollie backside pop shov it frontside pivot"
-  },
-  {
-    "name": "Fakie backside pop shov it frontside pivot"
-  },
-  {
-    "name": "Switch backside pop shov it frontside pivot"
-  },
-  {
-    "name": "Nollie Fronside pop shov it backside pivot"
-  },
-  {
-    "name": "Fakie Fronside pop shov it backside pivot"
-  },
-  {
-    "name": "360 Frontside pop shov it"
-  },
-  {
-    "name": "Fakie 360 Frontside pop shov it"
-  },
-  {
-    "name": "Switch 360 Frontside pop shov it"
-  },
-  {
-    "name": "Nollie 360 Frontside pop shov it"
-  },
-  {
-    "name": "360 Backside pop shov it"
-  },
-  {
-    "name": "Fakie 360 Backside pop shov it"
-  },
-  {
-    "name": "Switch 360 Backside pop shov it"
-  },
-  {
-    "name": "Nollie 360 Backside pop shov it"
-  },
-  {
-    "name": "Switch double kickflip"
-  },
-  {
-    "name": "Nollie double kickflip"
-  },
-  {
-    "name": "Switch Varial Heelflip"
-  },
-  {
-    "name": "Nollie Varial Heelflip"
-  },
-  {
-    "name": "Switch 180 backside kickflip"
-  },
-  {
-    "name": "Nollie 180 backside kickflip"
-  },
-  {
-    "name": "Switch 180 frontside kickflip"
-  },
-  {
-    "name": "Nollie 180 frontside kickflip"
-  },
-  {
-    "name": "Hardflip"
-  },
-  {
-    "name": "Fakie Hardflip"
-  },
-  {
-    "name": "Switch Hardflip"
-  },
-  {
-    "name": "Nollie Hardflip"
-  },
-  {
-    "name": "Late shov-it"
-  },
-  {
-    "name": "Fakie Late shov-it"
-  },
-  {
-    "name": "Switch Late shov-it"
-  },
-  {
-    "name": "Nollie Late shov-it"
-  },
-  {
-    "name": "Frontside bigspin"
-  },
-  {
-    "name": "Switch Frontside bigspin"
-  },
-  {
-    "name": "Switch heelfip"
-  },
-  {
-    "name": "Nollie heelfip"
-  },
-  {
-    "name": "Frontside 360"
-  },
-  {
-    "name": "Fakie Frontside 360"
-  },
-  {
-    "name": "Switch Frontside 360"
-  },
-  {
-    "name": "Nollie Frontside 360"
-  },
-  {
-    "name": "Backside 360"
-  },
-  {
-    "name": "Fakie Backside 360"
-  },
-  {
-    "name": "Switch Backside 360"
-  },
-  {
-    "name": "Nollie Backside 360"
-  }
+  {"name": "Frontside Flip"},
+  {"name": "Fakie Frontside Flip"},
+  {"name": "Switch Frontside Flip"},
+  {"name": "Nollie Frontside Flip"},
+  {"name": "Nollie Frontside Pivot"},
+  {"name": "Nollie Backside Pivot"},
+  {"name": "Nollie Frontside 360"},
+  {"name": "Switch Frontside 360"},
+  {"name": "Switch Backside 360"},
+  {"name": "Nollie Backside 360"},
+  {"name": "Nollie Backside Pop Shov-it Frontside pivot"},
+  {"name": "Fakie Backside Pop Shov-it Frontside pivot"},
+  {"name": "Switch Backside Pop Shov-it Frontside pivot"},
+  {"name": "Nollie Fronside Pop Shov-it Backside pivot"},
+  {"name": "Fakie Fronside Pop Shov-it Backside pivot"},
+  {"name": "360 Frontside Pop Shov-it"},
+  {"name": "Fakie 360 Frontside Pop Shov-it"},
+  {"name": "Nollie 360 Frontside Pop Shov-it"},
+  {"name": "Switch 360 Frontside Pop Shov-it"},
+  {"name": "360 Backside Pop Shov-it"},
+  {"name": "Fakie 360 Backside Pop Shov-it"},
+  {"name": "Nollie 360 Backside Pop Shov-it"},
+  {"name": "Switch 360 Backside Pop Shov-it"},
+  {"name": "Switch double kickflip"},
+  {"name": "Nollie double kickflip"},
+  {"name": "Switch Varial Heelflip"},
+  {"name": "Nollie Varial Heelflip"},
+  {"name": "Switch 180 Backside kickflip"},
+  {"name": "Nollie 180 Backside kickflip"},
+  {"name": "Switch 180 Frontside kickflip"},
+  {"name": "Nollie 180 Frontside kickflip"},
+  {"name": "Switch 360 flip"},
+  {"name": "Frontside Big spin"},
+  {"name": "Switch Frontside big spin"},
+  {"name": "180 Frontside heelflip"},
+  {"name": "Fakie 180 Frontside heelflip"},
+  {"name": "Switch 180 Frontside heelflip"},
+  {"name": "Nollie 180 Frontside heelflip"},
+  {"name": "180 Backside  heelflip"},
+  {"name": "Fakie 180 Backside heelflip"},
+  {"name": "Switch 180 Backside heelflip"},
+  {"name": "Nollie 180 Backside heelflip"},
+  {"name": "Hardflip"},
+  {"name": "Fakie Hardflip"},
+  {"name": "Nollie Hardflip"},
+  {"name": "Switch Hardflip"},
+  {"name": "Late Backside shov-it"},
+  {"name": "Fakie Late Backside shov-it"},
+  {"name": "Switch Late Backside shov-it"},
+  {"name": "Nollie Late Backside shov-it"},
+  {"name": "Late Frontside shov-it"},
+  {"name": "Fakie Late Frontside shov-it"},
+  {"name": "Switch Late Frontside shov-it"},
+  {"name": "Nollie Late Frontside shov-it"},
+  {"name": "Frontside bigspin"},
+  {"name": "Switch Frontside bigspin"},
+  {"name": "Nollie heelfip"},
+  {"name": "Switch heelfip"},
+  {"name": "Kickflip body varial"},
+  {"name": "Fakie kickflip  body varial"},
+  {"name": "Nollie kickflip body varial"},
+  {"name": "Switch kickflip body varial"},
+  {"name": "Heelflip body varial"},
+  {"name": "Fakie Heelflip  body varial"},
+  {"name": "Nollie Heelflip body varial"},
+  {"name": "Switch Heelflip body varial"},
+  {"name": "Ollie body varial"},
+  {"name": "Fakie Ollie  body varial"},
+  {"name": "Nollie Ollie body varial"},
+  {"name": "Switch Ollie body varial"},
+  {"name": "Fronstide shov it body varial"},
+  {"name": "Fakie Fronstide shov it  body varial"},
+  {"name": "Nollie Fronstide shov it body varial"},
+  {"name": "Switch Fronstide shov it body varial"},
+  {"name": "Late flip"},
+  {"name": "Fakie  Late"},
+  {"name": "Switch late flip"},
+  {"name": "Nollie late flip"},
+  {"name": "Laser Flip"},
+  {"name": "Switch Laser Flip"},
+  {"name": "Fakie Laser Flip"},
+  {"name": "Nollie Laser Flip"},
+  {"name": "Ollie north"},
+  {"name": "Switch ollie north"},
+  {"name": "Fakie ollie north"},
+  {"name": "nollie north"},
+  {"name": "Ollie south"},
+  {"name": "Switch ollie south"},
+  {"name": "Fakie ollie south"},
+  {"name": "nollie south"},
+  {"name": "No comply"},
+  {"name": "switch no comply"},
+  {"name": "Fronside Shove it No comply"},
+  {"name": "Switch Fronside Shove it no comply"},
+  {"name": "Backside Shove it No comply"},
+  {"name": "Switch Backside Shove it no comply"},
+  {"name": "Frontside 180 No comply"},
+  {"name": "Frontside 180 switch no comply"},
+  {"name": "Backside 180 No comply"},
+  {"name": "Backside 180 switch no comply"},
+  {"name": "Boneless"},
+  {"name": "switch boneless"},
+  {"name": "Fakie boneless"},
+  {"name": "Nollie boneless "}
 ]
