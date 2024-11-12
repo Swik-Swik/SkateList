@@ -6,7 +6,9 @@ fetch("json/videos.json")
 
     // console.log(JSON.stringify(videos));
     // Display each video
+    let nbTricksDone = 0
     videos.forEach((video) => {
+      nbTricksDone++;
       // Add to drop down toggle
       const trickDoneLi = document.createElement("li");
       const dropItem = document.createElement("a");
@@ -26,11 +28,9 @@ fetch("json/videos.json")
         console.log(video.types[0]);
         switch (video.types[0]) {
           case "NORMAL":
-            console.log("velo10");
             trickImage.src = "../images/normal.jpg";
             break;
           case "NOLLIE":
-            console.log("veloKKKK");
             trickImage.src = "../images/nollie.jpg";
             break;
           case "FAKIE":
@@ -88,7 +88,12 @@ fetch("json/videos.json")
       colDiv.id = video.title;
       tricksCards.appendChild(colDiv);
     });
-
+    
+    let trickDoneTitle = document.getElementById('trickDoneTitle');
+    if (trickDoneTitle) {
+        trickDoneTitle.textContent = `Tricks Done : ${nbTricksDone}`;
+    }
+    
     // Add event listener for search bar
     const searchBar = document.querySelector("#search-bar");
     searchBar.addEventListener("keyup", (event) => {
@@ -113,7 +118,9 @@ fetch("json/todo.json")
   .then((response) => response.json())
   .then((todoTricks) => {
     // Display each todo trick
+    let nbTricksTodo = 0
     todoTricks.forEach((tricks) => {
+      nbTricksTodo++
       // Add to Drop down list
       const trickTodoLi = document.createElement("li");
       const dropTodoItem = document.createElement("p");
@@ -122,4 +129,9 @@ fetch("json/todo.json")
       const dropDown = document.querySelector("#dropdown-todo");
       dropDown.appendChild(trickTodoLi);
     });
+    
+    let trickTodoTitle = document.getElementById('trickTodoTitle');
+    if (trickTodoTitle) {
+      trickTodoTitle.textContent = `Tricks Todo : ${nbTricksTodo}`;
+    }
   });

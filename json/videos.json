@@ -84,6 +84,24 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
+    "title": "Nollie Backside 360 Pop Shov-it",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Fackie Frontside 360 Pop Shov-it",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Nollie Frontside 360 Pop Shov-it",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
     "title": "Frontside 180",
     "path": "",
     "types": ["NORMAL", "ROTATION"],
@@ -261,7 +279,7 @@
     "title": "Nollie 360 flip",
     "path": "",
     "types": ["FAKIE", "FLIPTRICK"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+    "dateAndPlace": [{ "date": "2023-11-03", "place": "?" }]
   },
   {
     "title": "Heelflip",
@@ -342,19 +360,25 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Ollie Fronside pivot",
+    "title": "Ollie Frontside pivot",
     "path": "",
     "types": ["NORMAL", "PIVOT"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Fakie ollie Fronside pivot",
+    "title": "Fakie ollie Frontside pivot",
     "path": "",
     "types": ["FAKIE", "PIVOT"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Switch ollie Fronside pivot",
+    "title": "Nollie Frontside pivot",
+    "path": "",
+    "types": ["SWITCH", "PIVOT"],
+    "dateAndPlace": [{ "date": "2024-11-11", "place": "?" }]
+  },
+  {
+    "title": "Switch ollie Frontside pivot",
     "path": "",
     "types": ["SWITCH", "PIVOT"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
@@ -372,6 +396,12 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
+    "title": "Nollie Backside pivot",
+    "path": "",
+    "types": ["SWITCH", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-11-11", "place": "?" }]
+  },
+  {
     "title": "Switch ollie Backside pivot",
     "path": "",
     "types": ["SWITCH", "PIVOT"],
@@ -384,7 +414,25 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Backside Pop Shov-it body varial",
+    "title": "Fakie Backside Pop Shov-it frontside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Switch Backside Pop Shov-it frontside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Nollie Frontside Pop Shov-it Backside pivot",
+    "path": "",
+    "types": ["NORMAL", "PIVOT"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Switch Backside Pop Shov-it body varial",
     "path": "",
     "types": ["NORMAL"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
