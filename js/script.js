@@ -45,11 +45,17 @@ fetch("json/videos.json")
         videoOrPicture = trickImage;
       } else {
         const videoElem = document.createElement("iframe");
-        videoElem.height = "240";
+        // TODO 
+        // const containerWidth = window.innerWidth/2;  // For example, 80% of the window width
+        // const aspectRatio = 16 / 9;  // 16:9 aspect ratio
+        // videoElem.width = containerWidth;
+        // videoElem.height = containerWidth / aspectRatio;  // Set height based on width and aspect ratio
+
+        videoElem.height = "500";
         height = videoElem.src =
           "https://www.youtube.com/embed/" +
           video.path +
-          "?mute=1&controls=0&loop=1";
+          "?mute=1&controls=0&loop=1&vd=hd1080";
         videoOrPicture = videoElem;
       }
       // Create card div
