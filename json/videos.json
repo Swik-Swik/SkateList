@@ -454,5 +454,40 @@
     "path": "",
     "types": ["SWITCH"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Boneless",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },
+  {
+    "title": "Switch boneless",
+    "path": "",
+    "types": ["SWITCH"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },
+  {
+    "title": "Frontside 180 No comply",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },
+  {
+    "title": "Backside Shove it No comply",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },
+  {
+    "title": "No comply",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },
+  {
+    "title": "Fronside Shove it No comply",
+    "path": "",
+    "types": ["SWINORMALTCH"],
+    "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
   }
-]
