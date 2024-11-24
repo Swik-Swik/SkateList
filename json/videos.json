@@ -490,5 +490,53 @@
     "path": "",
     "types": ["NORMAL"],
     "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
+  },  
+  {
+    "title": "Ollie north",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Fakie ollie north",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Switch ollie north",
+    "path": "",
+    "types": ["SWITCH"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Nollie north",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Ollie south",
+    "path": "",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Fakie ollie south",
+    "path": "",
+    "types": ["FAKIE"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Nollie south",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
+  },
+  {
+    "title": "Switch ollie south",
+    "path": "",
+    "types": ["SWITCH"],
+    "dateAndPlace": [{ "date": "2024-11-24", "place": "Car wash" }]
   }
 ]
