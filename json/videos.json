@@ -228,55 +228,55 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Fakie 180 Frontside kickflip",
-    "path": "",
-    "types": ["FAKIE", "FLIPTRICK"],
-    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
-  },
-  {
     "title": "180 Frontside kickflip",
     "path": "",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Varial flip",
+    "title": "Fakie 180 Frontside kickflip",
+    "path": "",
+    "types": ["FAKIE", "FLIPTRICK"],
+    "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
+  },
+  {
+    "title": "Varial Flip",
     "path": "eLuAzxYWC0Q",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Fakie varial flip",
+    "title": "Fakie varial Flip",
     "path": "",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Nollie varial flip",
+    "title": "Nollie varial Flip",
     "path": "",
     "types": ["NOLLIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Switch varial flip",
+    "title": "Switch varial Flip",
     "path": "",
     "types": ["SWITCH", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "360 flip",
+    "title": "360 Flip",
     "path": "b6L280eVU5s",
     "types": ["NORMAL", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Fakie 360 flip",
+    "title": "Fakie 360 Flip",
     "path": "",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Nollie 360 flip",
+    "title": "Nollie 360 Flip",
     "path": "",
     "types": ["FAKIE", "FLIPTRICK"],
     "dateAndPlace": [{ "date": "2023-11-03", "place": "?" }]
@@ -348,13 +348,13 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Nollie frontside bigspin",
+    "title": "Nollie Frontside bigspin",
     "path": "",
     "types": ["NOLLIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Fakie frontside bigspin",
+    "title": "Fakie Frontside bigspin",
     "path": "",
     "types": ["FAKIE", "ROTATION"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
@@ -432,7 +432,7 @@
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
   },
   {
-    "title": "Switch Backside Pop Shov-it body varial",
+    "title": "Backside Pop Shov-it body varial",
     "path": "",
     "types": ["NORMAL"],
     "dateAndPlace": [{ "date": "2023-07-20", "place": "?" }]
@@ -488,7 +488,7 @@
   {
     "title": "Fronside Shove it No comply",
     "path": "",
-    "types": ["SWINORMALTCH"],
+    "types": ["NORMAL"],
     "dateAndPlace": [{ "date": "2024-11-17", "place": "?" }]
   }
 ]
