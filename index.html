@@ -3,7 +3,7 @@
   <head>
     <title>Skate Tricks Videos</title>
     <link rel="icon" type="image/x-icon" href="/images/skate.png" />
-    <link rel="stylesheet" type="text/css" href="scss/main.scss" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -18,100 +18,244 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
   </head>
   <body>
-    <!-- Navbar -->
-    <div id="main">
-      <nav class="navbar navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#"
-            ><img
-              src="/images/normal.jpg"
-              alt="Logo"
-              width="30"
-              height="30"
-              class="d-inline-block align-text-top"
-            />
-            Skate Tricks
-          </a>
-          <form class="d-flex" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              id="search-bar"
-            />
-          </form>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-dark fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            src="/images/swik_logo.svg"
+            alt="Logo"
+            width="60"
+            height="60"
+            class="d-inline-block align-text-top"
+          />
+          Skate Tricks
+        </a>
+
+        <!-- Search Form Centered -->
+        <form class="d-flex mx-auto" role="search">
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            id="search-bar"
+          />
+        </form>
+
+        <!-- Right-aligned Menu Toggler -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasDarkNavbar"
+          aria-controls="offcanvasDarkNavbar"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+          class="offcanvas offcanvas-end text-bg-dark"
+          tabindex="-1"
+          id="offcanvasDarkNavbar"
+          aria-labelledby="offcanvasDarkNavbarLabel"
+        >
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">
+              Tricks list
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  id="trickDoneTitle"
+                >
+                  Tricks Done
+                </a>
+                <ul
+                  id="dropdown-done"
+                  class="dropdown-menu dropdown-menu-dark"
+                ></ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  id="trickTodoTitle"
+                >
+                  Tricks Todo
+                </a>
+                <ul
+                  id="dropdown-todo"
+                  class="dropdown-menu dropdown-menu-dark"
+                ></ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Logo Intro Section -->
+    <section class="logo-intro-section">
+      <div class="container-fluid">
+        <div class="text-center py-4">
+          <img src="./images/swik_logo.svg" alt="Swik Logo" class="main-logo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Carousel Section for Highlighted Videos -->
+    <section class="carousel-section py-4">
+      <div class="container">
+        <h2 class="text-center mb-4" id="carousel-title">Featured Tricks</h2>
+        <div
+          id="highlightedCarousel"
+          class="carousel slide"
+          data-bs-ride="carousel"
+        >
+          <div class="carousel-inner" id="carousel-content">
+            <!-- Carousel items will be populated by JavaScript -->
+          </div>
           <button
-            class="navbar-toggler"
+            class="carousel-control-prev"
             type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasDarkNavbar"
-            aria-controls="offcanvasDarkNavbar"
-            aria-label="Toggle navigation"
+            data-bs-target="#highlightedCarousel"
+            data-bs-slide="prev"
           >
-            <span class="navbar-toggler-icon"></span>
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
           </button>
-          <div
-            class="offcanvas offcanvas-end text-bg-dark"
-            tabindex="-1"
-            id="offcanvasDarkNavbar"
-            aria-labelledby="offcanvasDarkNavbarLabel"
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#highlightedCarousel"
+            data-bs-slide="next"
           >
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">
-                Tricks list
-              </h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              ></button>
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Section with Tabs -->
+    <main class="main-section">
+      <div class="container">
+        <!-- Tab Navigation -->
+        <ul
+          class="nav nav-tabs justify-content-center mb-4"
+          id="trickTabs"
+          role="tablist"
+        >
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="flat-tricks-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#flat-tricks"
+              type="button"
+              role="tab"
+              aria-controls="flat-tricks"
+              aria-selected="true"
+            >
+              Flat Tricks
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="grinds-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#grinds"
+              type="button"
+              role="tab"
+              aria-controls="grinds"
+              aria-selected="false"
+            >
+              Grinds
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="other-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#other"
+              type="button"
+              role="tab"
+              aria-controls="other"
+              aria-selected="false"
+            >
+              Other
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="trickTabsContent">
+          <!-- Flat Tricks Tab -->
+          <div
+            class="tab-pane fade show active"
+            id="flat-tricks"
+            role="tabpanel"
+            aria-labelledby="flat-tricks-tab"
+          >
+            <div
+              class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"
+              id="flatTricksGrid"
+            >
+              <!-- Flat tricks will be populated by JavaScript -->
             </div>
-            <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    id="trickDoneTitle"
-                  >
-                    Tricks Done
-                  </a>
-                  <ul
-                    id="dropdown-done"
-                    class="dropdown-menu dropdown-menu-dark"
-                  ></ul>
-                </li>
-                <li class="nav-item dropdown">
-                  <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    id="trickTodoTitle"
-                  >
-                    Tricks Todo
-                  </a>
-                  <ul
-                    id="dropdown-todo"
-                    class="dropdown-menu dropdown-menu-dark"
-                  ></ul>
-                </li>
-              </ul>
+          </div>
+
+          <!-- Grinds Tab -->
+          <div
+            class="tab-pane fade"
+            id="grinds"
+            role="tabpanel"
+            aria-labelledby="grinds-tab"
+          >
+            <div
+              class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"
+              id="grindsGrid"
+            >
+              <!-- Grinds will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Other Tab -->
+          <div
+            class="tab-pane fade"
+            id="other"
+            role="tabpanel"
+            aria-labelledby="other-tab"
+          >
+            <div
+              class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"
+              id="otherGrid"
+            >
+              <!-- Other tricks will be populated by JavaScript -->
             </div>
           </div>
         </div>
-      </nav>
-    </div>
-    <!-- body of the page -->
-    <div
-      class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xxl-3 g-2"
-      id="tricksCards"
-    ></div>
+      </div>
+    </main>
   </body>
 </html>
