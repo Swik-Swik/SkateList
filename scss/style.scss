@@ -10,6 +10,8 @@
 // Color Palette
 $color-bg-main: #121212; // Main page background (darkest)
 $color-bg-surface: #1e1e1e; // Surface color for cards, navbar, sections
+$color-bg-navbar: #181818; // Navbar background (subtle darker gray)
+$color-navbar-accent: #2a2a2a; // Navbar accent color (subtle gray)
 $color-border: #333333; // Subtle borders
 $color-text-primary: #f5f5f5; // Primary text, titles
 $color-text-secondary: #aaaaaa; // Secondary, less important text
@@ -90,34 +92,101 @@ h6 {
 
 .navbar {
   &.navbar-dark {
-    @include section-base;
-    border-bottom-width: 1px;
+    background: linear-gradient(
+      135deg,
+      $color-bg-navbar 0%,
+      darken($color-bg-navbar, 5%) 100%
+    );
+    border-bottom: 2px solid $color-navbar-accent;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    min-height: $navbar-height;
+    padding: 0.5rem 1rem;
+
+    // Ensure proper alignment
+    .container-fluid {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
 
     .navbar-brand {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       color: $color-text-primary !important;
+      font-weight: 600;
+      transition: color $transition-base;
 
       img {
         color: $color-text-primary;
+        filter: brightness(1.1);
       }
 
       &:hover {
-        color: $color-accent;
+        color: lighten($color-text-secondary, 20%);
       }
+    }
+
+    // Center search form with proper width
+    form[role="search"] {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 auto;
+
+      .form-control {
+        width: 100%;
+        min-width: 300px;
+        margin: 0;
+        padding: 0.375rem 0.75rem;
+        background-color: rgba($color-bg-surface, 0.9);
+        border: 1px solid rgba($color-navbar-accent, 0.5);
+        color: $color-text-primary;
+        transition: all $transition-base;
+
+        &::placeholder {
+          color: $color-text-secondary;
+        }
+
+        &:focus {
+          background-color: $color-bg-surface;
+          border-color: lighten($color-navbar-accent, 30%);
+          box-shadow: 0 0 0 0.2rem rgba($color-navbar-accent, 0.25);
+          color: $color-text-primary;
+        }
+      }
+    }
+
+    #search-bar {
+      margin: 0;
     }
 
     .navbar-toggler {
-      border-color: $color-text-inactive;
+      border: 1px solid $color-navbar-accent;
+      background-color: rgba($color-navbar-accent, 0.1);
+      width: 44px;
+      height: 38px;
+      padding: 7px 9px;
+      border-radius: 6px;
+      transition: all $transition-base;
+
+      &:hover {
+        background-color: rgba($color-navbar-accent, 0.2);
+        border-color: lighten($color-navbar-accent, 20%);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba($color-navbar-accent, 0.5);
+        background-color: rgba($color-navbar-accent, 0.15);
+      }
 
       &-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(245, 245, 245, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        width: 100%;
+        height: 100%;
       }
-    }
-
-    .form-control {
-      min-width: 300px;
     }
   }
 }
@@ -396,6 +465,18 @@ h6 {
       }
     }
   }
+
+  // Responsive adjustments for offcanvas dropdown menus
+  .offcanvas-body .dropdown-menu {
+    max-height: 50vh; // Smaller on mobile to account for virtual keyboard
+  }
+
+  // Navbar toggler adjustments for mobile
+  .navbar-toggler {
+    width: 38px;
+    height: 34px;
+    padding: 5px 7px;
+  }
 }
 
 // =============================================================================
@@ -469,7 +550,7 @@ h6 {
       border: 1px solid $color-border;
       border-radius: $border-radius;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      max-height: 300px;
+      max-height: 60vh;
       overflow-y: auto;
       margin-top: 0.5rem;
 
@@ -512,9 +593,4 @@ h6 {
       }
     }
   }
-}
-
-.navbar-interactive-elements {
-  @include flex-center;
-  gap: 1rem;
 }
