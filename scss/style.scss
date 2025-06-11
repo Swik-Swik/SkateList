@@ -1,0 +1,154 @@
+// Variables
+$navbar-height: 70px;
+$primary-color: #111;
+$secondary-color: #444;
+$text-color: #818181;
+$hover-color: #f1f1f1;
+$border-color: black;
+$video-size: 200px;
+
+// Base styles
+body {
+  padding-top: $navbar-height;
+}
+
+// Commented out legacy styles - keeping for reference
+/* #main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+} */
+
+/* #search-bar {
+  position: sticky;
+  top: 0;
+} */
+
+/* #nav-and-content { */
+/* display: grid; */
+/* grid-template-columns: 40% 60%; */
+/* } */
+
+/* #trick-list {
+  grid-column: 1;
+} */
+
+/* #content {
+  grid-column: 2;
+} */
+
+/* Legacy sidebar styles - keeping for reference
+body {
+  font-family: "Lato", sans-serif;
+  display: grid;
+}
+
+.sidebar {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: $primary-color;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+
+  .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+
+  a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: $text-color;
+    display: block;
+    transition: 0.3s;
+
+    &:hover {
+      color: $hover-color;
+      text-decoration: none !important;
+    }
+  }
+
+  p {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #695b5b;
+    display: block;
+    transition: 0.3s;
+  }
+}
+
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: $primary-color;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+
+  &:hover {
+    background-color: $secondary-color;
+  }
+}
+
+#trick-list {
+  grid-column: 1;
+
+  a, p {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+#content {
+  grid-column: 2;
+}
+
+// Video styles
+.video-style {
+  width: $video-size;
+  height: $video-size;
+}
+
+.video-group {
+  border: 1px solid $border-color;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-dateplace-info,
+.video-tricktype-info {
+  text-align: center;
+  padding: 10px;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: grey;
+
+  .navbar-brand {
+    color: black;
+    text-decoration: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.padding_top {
+  margin-top: 100px;
+}
+*/
