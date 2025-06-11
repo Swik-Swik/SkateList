@@ -12,6 +12,7 @@ app.listen(3000, () => {
 
 // serve your css as static
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");

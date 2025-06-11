@@ -1,154 +1,485 @@
-// Variables
+// =============================================================================
+// SkateList SCSS Stylesheet
+// Dark Theme Skateboarding Video Website
+// =============================================================================
+
+// =============================================================================
+// 1. VARIABLES
+// =============================================================================
+
+// Color Palette
+$color-bg-main: #121212; // Main page background (darkest)
+$color-bg-surface: #1e1e1e; // Surface color for cards, navbar, sections
+$color-border: #333333; // Subtle borders
+$color-text-primary: #f5f5f5; // Primary text, titles
+$color-text-secondary: #aaaaaa; // Secondary, less important text
+$color-text-inactive: #888888; // Inactive tabs or elements
+$color-accent: #ffffff; // Active/hover elements (pure white for high contrast)
+
+// Layout & Sizing
 $navbar-height: 70px;
-$primary-color: #111;
-$secondary-color: #444;
-$text-color: #818181;
-$hover-color: #f1f1f1;
-$border-color: black;
-$video-size: 200px;
+$card-image-height: 250px;
+$card-image-height-tablet: 200px;
+$card-image-height-mobile: 180px;
+$border-radius: 10px;
 
-// Base styles
-body {
-  padding-top: $navbar-height;
-}
+// Spacing
+$section-padding: 2rem 0;
+$card-padding: 1rem;
 
-// Commented out legacy styles - keeping for reference
-/* #main {
-  display: grid;
-  grid-template-rows: auto 1fr;
-} */
+// Typography
+$font-weight-semibold: 600;
+$font-size-large: 1.1rem;
+$font-size-small: 0.9rem;
 
-/* #search-bar {
-  position: sticky;
-  top: 0;
-} */
+// Transitions
+$transition-base: 0.2s ease-in-out;
 
-/* #nav-and-content { */
-/* display: grid; */
-/* grid-template-columns: 40% 60%; */
-/* } */
+// Breakpoints
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 576px;
 
-/* #trick-list {
-  grid-column: 1;
-} */
+// =============================================================================
+// 2. MIXINS
+// =============================================================================
 
-/* #content {
-  grid-column: 2;
-} */
-
-/* Legacy sidebar styles - keeping for reference
-body {
-  font-family: "Lato", sans-serif;
-  display: grid;
-}
-
-.sidebar {
-  height: 100%;
-  width: 250px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: $primary-color;
-  overflow-x: hidden;
-  transition: 0.5s;
-  padding-top: 60px;
-
-  .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-  }
-
-  a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: $text-color;
-    display: block;
-    transition: 0.3s;
-
-    &:hover {
-      color: $hover-color;
-      text-decoration: none !important;
-    }
-  }
-
-  p {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 15px;
-    color: #695b5b;
-    display: block;
-    transition: 0.3s;
-  }
-}
-
-.openbtn {
-  font-size: 20px;
-  cursor: pointer;
-  background-color: $primary-color;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-
-  &:hover {
-    background-color: $secondary-color;
-  }
-}
-
-#trick-list {
-  grid-column: 1;
-
-  a, p {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-#content {
-  grid-column: 2;
-}
-
-// Video styles
-.video-style {
-  width: $video-size;
-  height: $video-size;
-}
-
-.video-group {
-  border: 1px solid $border-color;
-  display: inline-flex;
-  flex-direction: column;
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
-.video-dateplace-info,
-.video-tricktype-info {
-  text-align: center;
-  padding: 10px;
+@mixin section-base {
+  background-color: $color-bg-surface;
+  border-bottom: 1px solid $color-border;
 }
 
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: grey;
+@mixin card-hover-effect {
+  transition: transform $transition-base;
 
-  .navbar-brand {
-    color: black;
-    text-decoration: none;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
 }
 
-.padding_top {
-  margin-top: 100px;
+// =============================================================================
+// 3. BASE STYLES
+// =============================================================================
+
+body {
+  padding-top: $navbar-height;
+  background-color: $color-bg-main;
+  color: $color-text-primary;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $color-text-primary;
+  margin-bottom: 1rem;
+}
+
+// =============================================================================
+// 4. NAVIGATION
+// =============================================================================
+
+.navbar {
+  &.navbar-dark {
+    @include section-base;
+    border-bottom-width: 1px;
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: $color-text-primary !important;
+
+      img {
+        color: $color-text-primary;
+      }
+
+      &:hover {
+        color: $color-accent;
+      }
+    }
+
+    .navbar-toggler {
+      border-color: $color-text-inactive;
+
+      &-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      }
+    }
+
+    .form-control {
+      min-width: 300px;
+    }
+  }
+}
+
+.navbar-interactive-elements {
+  @include flex-center;
+  gap: 1rem;
+}
+
+// =============================================================================
+// 5. PAGE SECTIONS
+// =============================================================================
+
+// Logo Introduction Section
+.logo-intro-section {
+  @include section-base;
+  border-bottom-width: 2px;
+  padding: $section-padding;
+
+  .main-logo {
+    width: 37.5vw;
+    max-width: 450px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+// Carousel Section
+.carousel-section {
+  @include section-base;
+  padding: $section-padding;
+
+  h2 {
+    color: $color-text-primary;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  // Carousel container
+  .carousel {
+    max-width: 800px;
+    margin: 0 auto;
+
+    &-inner {
+      height: 350px;
+      border-radius: $border-radius;
+      overflow: hidden;
+    }
+
+    &-item {
+      height: 100%;
+
+      // Style for carousel videos
+      iframe {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      // Style for carousel placeholder images
+      .card-img-wrapper {
+        height: 100%;
+        width: 100%;
+        background-color: $color-bg-main;
+      }
+    }
+
+    // Navigation arrows
+    &-control-prev,
+    &-control-next {
+      width: 5%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: none;
+      opacity: 0.8;
+      transition: opacity $transition-base;
+
+      &:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      &:focus {
+        opacity: 1;
+      }
+
+      &-icon {
+        width: 2rem;
+        height: 2rem;
+        filter: invert(1);
+      }
+    }
+
+    &-control-prev {
+      left: 0;
+    }
+
+    &-control-next {
+      right: 0;
+    }
+  }
+}
+
+// Main Content Section
+.main-section {
+  padding: $section-padding;
+  min-height: 60vh;
+  background-color: $color-bg-surface;
+}
+
+// =============================================================================
+// 6. TABS & NAVIGATION
+// =============================================================================
+
+.nav-tabs {
+  border-bottom: 2px solid $color-border;
+  justify-content: center;
+
+  .nav-link {
+    color: $color-text-inactive;
+    font-weight: $font-weight-semibold;
+    padding: 1rem 2rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: none;
+    transition: all $transition-base;
+
+    &:hover {
+      border-color: transparent;
+      color: $color-accent;
+      border-bottom-color: $color-accent;
+    }
+
+    &.active {
+      color: $color-accent;
+      background-color: transparent;
+      border-color: transparent;
+      border-bottom-color: $color-accent;
+    }
+  }
+}
+
+// =============================================================================
+// 7. CARDS & CONTENT
+// =============================================================================
+
+.card {
+  @include card-hover-effect;
+  border: 1px solid $color-border;
+  border-radius: $border-radius;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: $color-bg-surface;
+
+  // Image wrapper for rotated placeholder images
+  &-img-wrapper {
+    height: $card-image-height;
+    width: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+    @include flex-center;
+    background-color: $color-bg-main;
+    position: relative;
+
+    .card-img-top {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transform: rotate(90deg);
+    }
+  }
+
+  // YouTube video iframes
+  iframe {
+    width: 100%;
+    height: $card-image-height;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+    border: none;
+  }
+
+  // Card content
+  &-body {
+    padding: $card-padding;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &-title {
+    font-size: $font-size-large;
+    font-weight: $font-weight-semibold;
+    margin-bottom: 0.5rem;
+    color: $color-text-primary;
+  }
+
+  &-text {
+    font-size: $font-size-small;
+    color: $color-text-secondary;
+    margin-bottom: 0;
+    flex-grow: 1;
+  }
+}
+
+// =============================================================================
+// 8. RESPONSIVE DESIGN
+// =============================================================================
+
+// Tablet Styles
+@media (max-width: $breakpoint-tablet) {
+  .logo-intro-section .main-logo {
+    width: 45vw;
+    max-width: 300px;
+  }
+
+  .card-img-wrapper,
+  .card iframe {
+    height: $card-image-height-tablet;
+  }
+}
+
+// Mobile Styles
+@media (max-width: $breakpoint-mobile) {
+  .logo-intro-section .main-logo {
+    width: 60vw;
+    max-width: 240px;
+  }
+
+  .card-img-wrapper,
+  .card iframe {
+    height: $card-image-height-mobile;
+  }
+
+  .nav-tabs .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: $font-size-small;
+  }
+}
+
+// =============================================================================
+// 9. OFFCANVAS SIDEBAR STYLING
+// =============================================================================
+
+.offcanvas {
+  &.text-bg-dark {
+    background-color: $color-bg-surface !important;
+    border-left: 1px solid $color-border;
+  }
+
+  &-header {
+    background-color: $color-bg-main;
+    border-bottom: 1px solid $color-border;
+    padding: 1.5rem;
+
+    .offcanvas-title {
+      color: $color-text-primary;
+      font-weight: $font-weight-semibold;
+      font-size: 1.25rem;
+    }
+
+    .btn-close {
+      &-white {
+        filter: invert(1);
+        opacity: 0.8;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &-body {
+    padding: 1.5rem;
+
+    .navbar-nav {
+      gap: 0.5rem;
+
+      .nav-item {
+        .nav-link {
+          color: $color-text-primary;
+          padding: 0.75rem 1rem;
+          border-radius: $border-radius;
+          font-weight: 500;
+          transition: all $transition-base;
+
+          &:hover {
+            background-color: $color-bg-main;
+            color: $color-accent;
+          }
+
+          &.dropdown-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &::after {
+              margin-left: auto;
+            }
+          }
+        }
+      }
+    }
+
+    // Dropdown menus styling
+    .dropdown-menu {
+      background-color: $color-bg-surface;
+      border: 1px solid $color-border;
+      border-radius: $border-radius;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+
+      .dropdown-item {
+        color: $color-text-primary;
+        padding: 0.75rem 1rem;
+        transition: all $transition-base;
+        border: none;
+        background: none;
+
+        &:hover,
+        &:focus {
+          background-color: $color-accent;
+          color: $color-bg-main;
+        }
+
+        &:active {
+          background-color: $color-accent;
+          color: $color-bg-main;
+        }
+      }
+
+      // Custom scrollbar for dropdown
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: $color-bg-main;
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: $color-text-inactive;
+        border-radius: 3px;
+
+        &:hover {
+          background: $color-text-secondary;
+        }
+      }
+    }
+  }
+}
+
+.navbar-interactive-elements {
+  @include flex-center;
+  gap: 1rem;
+}
