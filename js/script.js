@@ -1,6 +1,7 @@
 // Global variables
 let allVideos = [];
 let todoTricks = [];
+let carouselVideos = []; // Store carousel videos for title reference
 
 // Fetch the JSON data
 Promise.all([
@@ -30,6 +31,9 @@ function initializePage() {
 
   // Setup search functionality
   setupSearch();
+
+  // Setup carousel video controls
+  setupCarouselVideoControls();
 }
 
 function populateCarousel() {
@@ -41,7 +45,7 @@ function populateCarousel() {
   );
 
   // Take first 5 featured videos for carousel
-  const carouselVideos = featuredVideos.slice(0, 5);
+  carouselVideos = featuredVideos.slice(0, 5); // Store for title reference
 
   if (carouselVideos.length === 0) {
     carouselContent.innerHTML =
@@ -52,12 +56,16 @@ function populateCarousel() {
   carouselVideos.forEach((video, index) => {
     const carouselItem = document.createElement("div");
     carouselItem.className = `carousel-item ${index === 0 ? "active" : ""}`;
+    carouselItem.setAttribute("data-video-title", video.title); // Store title in data attribute
 
     const videoElement = createVideoElement(video);
     carouselItem.appendChild(videoElement);
 
     carouselContent.appendChild(carouselItem);
   });
+
+  // Set initial title
+  updateCarouselTitle(0);
 }
 
 function populateTabs() {
@@ -140,9 +148,10 @@ function populateGrid(gridId, videos) {
 function createVideoElement(video) {
   if (video.path && video.path !== "") {
     const videoElem = document.createElement("iframe");
-    videoElem.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=1&loop=1&vd=hd1080`;
+    videoElem.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=1&loop=1&vd=hd1080&enablejsapi=1`;
     videoElem.setAttribute("allowfullscreen", "");
     videoElem.setAttribute("frameborder", "0");
+    videoElem.setAttribute("id", `youtube-${video.path}`);
     return videoElem;
   } else {
     // Create a wrapper to contain the rotated image and prevent overflow
@@ -246,4 +255,93 @@ function setupSearch() {
       });
     });
   });
+}
+
+function setupCarouselVideoControls() {
+  const carousel = document.getElementById("highlightedCarousel");
+
+  if (!carousel) return;
+
+  // Function to pause all YouTube videos in the carousel
+  function pauseAllCarouselVideos() {
+    const iframes = carousel.querySelectorAll("iframe[id^='youtube-']");
+    iframes.forEach((iframe) => {
+      try {
+        // Send pause command to YouTube iframe
+        iframe.contentWindow.postMessage(
+          '{"event":"command","func":"pauseVideo","args":""}',
+          "*"
+        );
+      } catch (error) {
+        console.log("Could not pause video:", error);
+      }
+    });
+  }
+
+  // Function to stop all YouTube videos in the carousel (more aggressive than pause)
+  function stopAllCarouselVideos() {
+    const iframes = carousel.querySelectorAll("iframe[id^='youtube-']");
+    iframes.forEach((iframe) => {
+      try {
+        // Send stop command to YouTube iframe
+        iframe.contentWindow.postMessage(
+          '{"event":"command","func":"stopVideo","args":""}',
+          "*"
+        );
+      } catch (error) {
+        console.log("Could not stop video:", error);
+      }
+    });
+  }
+
+  // Listen for carousel slide events
+  carousel.addEventListener("slide.bs.carousel", function (event) {
+    // This event fires when the slide transition starts
+    // Pause all videos to ensure smooth transition
+    pauseAllCarouselVideos();
+
+    // Start title change animation
+    const titleElement = document.getElementById("carousel-title");
+    if (titleElement) {
+      titleElement.classList.add("title-changing");
+    }
+  });
+
+  carousel.addEventListener("slid.bs.carousel", function (event) {
+    // This event fires after the slide transition completes
+    // Stop all videos except the active one to free up resources
+    stopAllCarouselVideos();
+
+    // Update title with animation
+    const activeIndex = Array.from(
+      event.target.querySelectorAll(".carousel-item")
+    ).indexOf(event.relatedTarget);
+    updateCarouselTitle(activeIndex);
+  });
+}
+
+// Function to update carousel title with animation
+function updateCarouselTitle(activeIndex) {
+  const titleElement = document.getElementById("carousel-title");
+  if (!titleElement || !carouselVideos[activeIndex]) return;
+
+  const newTitle = carouselVideos[activeIndex].title;
+
+  // If title is currently changing, update it
+  if (titleElement.classList.contains("title-changing")) {
+    // Wait for fade out, then change text and fade in
+    setTimeout(() => {
+      titleElement.textContent = newTitle;
+      titleElement.classList.remove("title-changing");
+      titleElement.classList.add("title-changed");
+
+      // Remove the title-changed class after animation
+      setTimeout(() => {
+        titleElement.classList.remove("title-changed");
+      }, 300);
+    }, 150); // Half of the transition duration
+  } else {
+    // Initial title set (no animation needed)
+    titleElement.textContent = newTitle;
+  }
 }
