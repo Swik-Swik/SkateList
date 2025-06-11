@@ -1,5 +1,8 @@
 {
   "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "yarn": "^1.22.22"
