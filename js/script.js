@@ -2,6 +2,7 @@
 let allVideos = [];
 let todoTricks = [];
 let carouselVideos = []; // Store carousel videos for title reference
+let currentOverlayVideo = null; // Track currently overlayed video
 
 // Fetch the JSON data
 Promise.all([
@@ -34,6 +35,9 @@ function initializePage() {
 
   // Setup carousel video controls
   setupCarouselVideoControls();
+
+  // Setup video overlay functionality
+  setupVideoOverlay();
 }
 
 function populateCarousel() {
@@ -119,7 +123,23 @@ function populateGrid(gridId, videos) {
     colDiv.id = video.title;
 
     const cardDiv = document.createElement("div");
-    cardDiv.className = "card h-100";
+    // Add video-card class for enhanced styling and mark as clickable
+    cardDiv.className = video.path ? "card h-100 video-card" : "card h-100";
+    cardDiv.setAttribute("data-video-title", video.title);
+    cardDiv.setAttribute("data-video-path", video.path || "");
+    cardDiv.setAttribute("data-video-types", video.types.join(", "));
+
+    // Make entire card clickable for video overlay (both video and non-video cards)
+    cardDiv.addEventListener("click", (e) => {
+      // Prevent event from triggering multiple times
+      e.stopPropagation();
+      openVideoOverlay(video);
+    });
+
+    // Add hover event listeners for video preview ONLY for cards with videos
+    if (video.path) {
+      setupVideoPreview(cardDiv, video);
+    }
 
     // Create video or image element
     const mediaElement = createVideoElement(video);
@@ -148,7 +168,8 @@ function populateGrid(gridId, videos) {
 function createVideoElement(video) {
   if (video.path && video.path !== "") {
     const videoElem = document.createElement("iframe");
-    videoElem.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=1&loop=1&vd=hd1080&enablejsapi=1`;
+    // Start with NO autoplay for cards - only static preview
+    videoElem.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=0&loop=0&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
     videoElem.setAttribute("allowfullscreen", "");
     videoElem.setAttribute("frameborder", "0");
     videoElem.setAttribute("id", `youtube-${video.path}`);
@@ -344,4 +365,217 @@ function updateCarouselTitle(activeIndex) {
     // Initial title set (no animation needed)
     titleElement.textContent = newTitle;
   }
+}
+
+// =============================================================================
+// VIDEO PREVIEW ON HOVER
+// =============================================================================
+
+function setupVideoPreview(cardElement, video) {
+  if (!video.path) return;
+
+  const iframe = cardElement.querySelector("iframe");
+  if (!iframe) return;
+
+  let hoverTimeout;
+  let leaveTimeout;
+  let isHovered = false;
+  let isPlaying = false;
+
+  cardElement.addEventListener("mouseenter", () => {
+    isHovered = true;
+    clearTimeout(leaveTimeout);
+
+    // Delay video start to avoid triggering on quick mouse movements
+    hoverTimeout = setTimeout(() => {
+      if (isHovered && !isPlaying) {
+        startVideoPreview(iframe, video);
+        isPlaying = true;
+      }
+    }, 700); // 700ms delay to avoid accidental triggers
+  });
+
+  cardElement.addEventListener("mouseleave", () => {
+    isHovered = false;
+    clearTimeout(hoverTimeout);
+
+    // Small delay before stopping to avoid flickering on quick mouse movements
+    leaveTimeout = setTimeout(() => {
+      if (!isHovered && isPlaying) {
+        stopVideoPreview(iframe, video);
+        isPlaying = false;
+      }
+    }, 100);
+  });
+}
+
+function startVideoPreview(iframe, video) {
+  try {
+    // Update src to enable autoplay with mute for preview
+    iframe.src = `https://www.youtube.com/embed/${video.path}?autoplay=1&mute=1&controls=0&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1&start=0`;
+  } catch (error) {
+    console.log("Could not start video preview:", error);
+  }
+}
+
+function stopVideoPreview(iframe, video) {
+  try {
+    // Reset to static preview (no autoplay, no loop)
+    iframe.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=0&loop=0&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
+  } catch (error) {
+    console.log("Could not stop video preview:", error);
+  }
+}
+
+// =============================================================================
+// VIDEO OVERLAY FUNCTIONALITY
+// =============================================================================
+
+function setupVideoOverlay() {
+  // Create video overlay HTML structure with fixed container
+  const overlayHTML = `
+    <div class="video-overlay" id="videoOverlay">
+      <div class="video-overlay-content">
+        <div class="video-overlay-close" id="overlayClose">×</div>
+        <div class="video-overlay-video-container" id="overlayVideoContainer"></div>
+        <div class="video-overlay-info" id="overlayInfo">
+          <h3 id="overlayTitle"></h3>
+          <p id="overlayTypes"></p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add overlay to body
+  document.body.insertAdjacentHTML("beforeend", overlayHTML);
+
+  // Setup event listeners
+  const overlay = document.getElementById("videoOverlay");
+  const closeBtn = document.getElementById("overlayClose");
+
+  // Close overlay when clicking close button
+  closeBtn.addEventListener("click", closeVideoOverlay);
+
+  // Close overlay when clicking outside content
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      closeVideoOverlay();
+    }
+  });
+
+  // Close overlay with Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) {
+      closeVideoOverlay();
+    }
+  });
+}
+
+function openVideoOverlay(video) {
+  const overlay = document.getElementById("videoOverlay");
+  const container = document.getElementById("overlayVideoContainer");
+  const title = document.getElementById("overlayTitle");
+  const types = document.getElementById("overlayTypes");
+
+  // Set video info
+  title.textContent = video.title;
+  types.textContent = video.types.join(", ");
+
+  // Clear previous content
+  container.innerHTML = "";
+
+  // Create video content
+  if (video.path && video.path !== "") {
+    // Create YouTube iframe with larger size and better parameters
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.youtube.com/embed/${video.path}?autoplay=1&mute=0&controls=1&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
+    iframe.setAttribute("allowfullscreen", "");
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("allow", "autoplay; encrypted-media");
+    iframe.setAttribute("id", `overlay-youtube-${video.path}`);
+    container.appendChild(iframe);
+  } else {
+    // Create placeholder for videos without path
+    const placeholder = document.createElement("div");
+    placeholder.className = "video-placeholder";
+
+    const placeholderImg = document.createElement("img");
+    placeholderImg.className = "placeholder-image";
+
+    // Set image based on trick type
+    switch (video.types[0]) {
+      case "NORMAL":
+        placeholderImg.src = "./images/normal.jpg";
+        break;
+      case "NOLLIE":
+        placeholderImg.src = "./images/nollie.jpg";
+        break;
+      case "FAKIE":
+        placeholderImg.src = "./images/fakie.jpg";
+        break;
+      case "SWITCH":
+        placeholderImg.src = "./images/switch.jpg";
+        break;
+      default:
+        placeholderImg.src = "./images/unknown.jpg";
+    }
+    placeholderImg.alt = video.title;
+
+    const placeholderText = document.createElement("div");
+    placeholderText.className = "placeholder-text";
+    placeholderText.innerHTML = `
+      <h3>${video.title}</h3>
+      <p>Video coming soon...</p>
+      <p>This trick is on the todo list!</p>
+    `;
+
+    placeholder.appendChild(placeholderImg);
+    placeholder.appendChild(placeholderText);
+    container.appendChild(placeholder);
+  }
+
+  // Store current video reference
+  currentOverlayVideo = video;
+
+  // Prevent body scrolling
+  document.body.classList.add("video-overlay-active");
+
+  // Show overlay with animation
+  overlay.classList.add("active");
+}
+
+function closeVideoOverlay() {
+  const overlay = document.getElementById("videoOverlay");
+
+  if (!overlay || !overlay.classList.contains("active")) {
+    return;
+  }
+
+  // Hide overlay
+  overlay.classList.remove("active");
+
+  // Re-enable body scrolling
+  document.body.classList.remove("video-overlay-active");
+
+  // Stop any playing videos after animation completes
+  setTimeout(() => {
+    if (currentOverlayVideo && currentOverlayVideo.path) {
+      const iframe = document.getElementById(
+        `overlay-youtube-${currentOverlayVideo.path}`
+      );
+      if (iframe) {
+        // Stop the video by reloading the iframe src without autoplay
+        iframe.src = `https://www.youtube.com/embed/${currentOverlayVideo.path}?mute=1&controls=1&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
+      }
+    }
+
+    // Clear the container content
+    const container = document.getElementById("overlayVideoContainer");
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    // Clear current video reference
+    currentOverlayVideo = null;
+  }, 400); // Match the CSS transition duration
 }
