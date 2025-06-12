@@ -11,7 +11,7 @@ npm install
 npm start
 ```
 
-Access at `http://localhost:3001`
+Access at `http://localhost:3000`
 
 ## Development
 
@@ -50,7 +50,7 @@ NODE_ENV=production npm start
 
 ### Environment Variables
 
-- `PORT` - Server port (default: 3001)
+- `PORT` - Server port (default: 3000)
 - `NODE_ENV` - Environment (development/production)
 
 ## Data Management
@@ -96,4 +96,4 @@ Edit `json/todo.json`:
 
 **Videos not loading:** Check YouTube video IDs in videos.json
 **SCSS not compiling:** Run `npm run scss` manually
-**Port conflicts:** Set `PORT=3001` or different port
+**Port conflicts:** Set `PORT=3000` or different port

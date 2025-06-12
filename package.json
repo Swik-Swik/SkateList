@@ -13,7 +13,7 @@
     "build": "npm run sass:build && npm run js:minify",
     "js:minify": "terser js/script.js -o public/js/script.min.js --compress --mangle",
     "prestart": "npm run build",
-    "health": "curl -f http://localhost:3001/health || exit 1"
+    "health": "curl -f http://localhost:3000/health || exit 1"
   },
   "keywords": [
     "skateboard",
