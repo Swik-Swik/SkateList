@@ -1,15 +1,39 @@
 {
+  "name": "skatelist",
+  "version": "1.0.0",
+  "description": "A skateboard tricks showcase application",
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "scss": "sass scss/main.scss public/css/style.css --watch",
-    "build": "sass scss/main.scss public/css/style.css"
+    "dev": "concurrently \"npm run scss:watch\" \"npm run start\"",
+    "scss": "sass scss/main.scss public/css/style.css",
+    "scss:watch": "sass scss/main.scss public/css/style.css --watch",
+    "build": "npm run scss && npm run minify:js && npm run minify:css",
+    "minify:js": "terser js/script.js -o js/script.min.js --compress --mangle",
+    "minify:css": "cleancss -o public/css/style.min.css public/css/style.css",
+    "clean": "rm -rf js/*.min.js public/css/*.min.css"
   },
+  "keywords": [
+    "skateboard",
+    "tricks",
+    "video",
+    "showcase"
+  ],
+  "author": "Swik-Swik",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "yarn": "^1.22.22"
+    "compression": "^1.7.4",
+    "helmet": "^7.1.0"
   },
   "devDependencies": {
-    "sass": "^1.89.2"
+    "sass": "^1.89.2",
+    "terser": "^5.26.0",
+    "clean-css-cli": "^5.6.2",
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }

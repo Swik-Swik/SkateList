@@ -1,175 +1,99 @@
-# SkateList
+# SkateList - Development Guide
 
-A modern web application for displaying and organizing skateboarding trick videos with a beautiful dark theme interface.
+Skateboard tricks video showcase web application.
 
-## ✨ Features
-
-- **Featured Carousel**: Highlights videos with YouTube paths in an elegant carousel
-- **Organized Categories**: Automatically categorizes tricks into tabs:
-  - **Flat Tricks**: Flip tricks, rotations, pivots, and basic stances
-  - **Grinds**: Grinding tricks (expandable for future content)
-  - **Other**: All remaining tricks
-- **Dynamic Search**: Real-time filtering across all categories
-- **Progress Tracking**:
-  - "Tricks Done" dropdown with completed tricks
-  - "Tricks Todo" dropdown for planned tricks
-- **Responsive Design**: Mobile-first design that works on all devices
-- **Dark Theme**: Modern, eye-friendly dark interface
-- **YouTube Integration**: Embedded video players with controls
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v14 or higher, includes npm)
-
-### Recommended Global Tools
-
-For the best development experience, install these tools globally:
+## Quick Start
 
 ```bash
-npm install -g nodemon sass
-```
-
-- **Nodemon**: Auto-restarts server on file changes
-- **Sass**: Enables SCSS compilation and watching
-
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/Swik-Swik/SkateList.git
-   cd SkateList
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### 🛠 Development Workflow
-
-This project uses **SCSS** for styling, which must be compiled to CSS.
-
-#### Option 1: Development Mode (Recommended)
-
-Run both processes simultaneously for live development:
-
-**Terminal 1 - SCSS Watcher:**
-
-```bash
-npm run scss
-```
-
-**Terminal 2 - Server:**
-
-```bash
+git clone https://github.com/Swik-Swik/SkateList.git
+cd SkateList
+npm install
 npm start
 ```
 
-#### Option 2: Manual Build
+Access at `http://localhost:3001`
 
-For single builds without watching:
+## Development
+
+### Local Development
 
 ```bash
-npm run build  # Compile SCSS to CSS
-npm start      # Start server
+npm run dev    # Start with SCSS watching
+npm start      # Start server only
 ```
 
-Visit `http://localhost:3000` to view the application.
+### File Structure
 
-## 📁 Project Structure
+- `js/script.js` - Main application code
+- `json/` - Data files (videos.json, todo.json)
+- `scss/` - Stylesheets (compiled to public/css/)
+- `server.js` - Express server
+- `index.html` - Main page
 
-```
-SkateList/
-├── index.html              # Main application page
-├── server.js               # Express.js server
-├── package.json            # Dependencies and scripts
-├── scss/                   # SCSS source files
-│   ├── main.scss          # Main SCSS entry point
-│   ├── style.scss         # Core application styles
-│   └── search.scss        # Search functionality styles
-├── public/css/            # Compiled CSS output
-│   └── style.css          # Generated from SCSS
-├── js/                    # JavaScript files
-│   └── script.js          # Main application logic
-├── json/                  # Data files
-│   ├── videos.json        # Video metadata and categories
-│   └── todo.json          # Todo tricks list
-├── images/                # Image assets
-│   ├── swik_logo.svg      # Main logo
-│   ├── normal.jpg         # Stance images...
-│   ├── nollie.jpg
-│   ├── fakie.jpg
-│   ├── switch.jpg
-│   └── unknown.jpg
-└── videos/                # Video files (if any local videos)
+### Key Commands
+
+```bash
+npm run scss           # Compile SCSS once
+npm run scss:watch     # Watch SCSS changes
+npm run build          # Build for production
+npm run clean          # Remove build files
 ```
 
-## 🎨 Customization
+## Production
 
-### Adding New Tricks
+### Build & Deploy
 
-1. **Completed Tricks**: Add to `json/videos.json`
+```bash
+npm run build          # Minify JS/CSS
+NODE_ENV=production npm start
+```
 
-   ```json
-   {
-     "title": "Kickflip",
-     "types": ["NORMAL", "FLIPTRICK"],
-     "path": "youtube-video-id" // Optional: for featured carousel
-   }
-   ```
+### Environment Variables
 
-2. **Todo Tricks**: Add to `json/todo.json`
-   ```json
-   {
-     "name": "Tre Flip"
-   }
-   ```
+- `PORT` - Server port (default: 3001)
+- `NODE_ENV` - Environment (development/production)
 
-### Styling
+## Data Management
 
-- Edit SCSS files in `scss/` directory
-- Run `npm run scss` for live compilation
-- Main variables are in `scss/style.scss` at the top
+### Adding Videos
 
-### Categories
+Edit `json/videos.json`:
 
-Tricks are automatically categorized by their `types`:
+```json
+{
+  "title": "Trick Name",
+  "types": ["FLIPTRICK", "NORMAL"],
+  "path": "youtube-video-id"
+}
+```
 
-- **Flat Tricks**: `FLIPTRICK`, `ROTATION`, `PIVOT`, `NORMAL`, `NOLLIE`, `FAKIE`, `SWITCH`
-- **Grinds**: Any type containing "grind"
-- **Other**: Everything else
+### Adding Todo Tricks
 
-## 🧰 Technologies
+Edit `json/todo.json`:
 
-- **Backend**: Express.js server
-- **Frontend**: Vanilla JavaScript, Bootstrap 5
-- **Styling**: SCSS/Sass with custom dark theme
-- **Video**: YouTube embed integration
-- **Build**: npm scripts for SCSS compilation
+```json
+{
+  "name": "Trick Name"
+}
+```
 
-## 📱 Browser Support
+## Technical Notes
 
-- Modern browsers (Chrome, Firefox, Safari, Edge)
-- Mobile responsive design
-- YouTube embed support required for video playback
+- Uses Express.js server with security middleware
+- Bootstrap 5 for UI components
+- YouTube iframe API for video embedding
+- SCSS compilation with Sass
+- Namespace pattern (SkateApp) to avoid global pollution
 
-## 🔧 Available Scripts
+## API Endpoints
 
-- `npm start` - Start the Express server
-- `npm run scss` - Watch and compile SCSS files
-- `npm run build` - One-time SCSS compilation
+- `GET /` - Main application
+- `GET /health` - Health check
+- `GET /json/videos.json` - Video data
+- `GET /json/todo.json` - Todo data
 
-## 🤝 Contributing
+## Troubleshooting
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with `npm run build && npm start`
-5. Submit a pull request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+**Videos not loading:** Check YouTube video IDs in videos.json
+**SCSS not compiling:** Run `npm run scss` manually
+**Port conflicts:** Set `PORT=3001` or different port
