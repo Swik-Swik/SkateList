@@ -42,7 +42,7 @@ const SkateApp = (function () {
   let previewTimeouts = new Map();
 
   /**
-   * Initialize application with performance optimizations
+   * Initialize application
    */
   async function init() {
     try {
@@ -60,7 +60,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Cache DOM elements once for performance
+   * Cache DOM elements for performance
    */
   function cacheElements() {
     const elementIds = [
@@ -225,19 +225,18 @@ const SkateApp = (function () {
   }
 
   /**
-   * Render tabs with performance optimizations
+   * Render tabs
    */
   function renderTabs() {
     const categorizedVideos = categorizeVideos(state.allVideos);
 
-    // Use document fragments for better performance
     renderGridOptimized(elements.flatTricksGrid, categorizedVideos.flatTricks);
     renderGridOptimized(elements.grindsGrid, categorizedVideos.grinds);
     renderGridOptimized(elements.otherGrid, categorizedVideos.other);
   }
 
   /**
-   * Categorize videos efficiently
+   * Categorize videos
    */
   function categorizeVideos(videos) {
     const categories = { flatTricks: [], grinds: [], other: [] };
@@ -279,12 +278,11 @@ const SkateApp = (function () {
   }
 
   /**
-   * Optimized grid rendering with document fragments
+   * Render grid with document fragments
    */
   function renderGridOptimized(gridElement, videos) {
     if (!gridElement) return;
 
-    // Handle empty state
     if (videos.length === 0) {
       gridElement.innerHTML = createEmptyStateHTML(
         "No tricks in this category yet"
@@ -304,7 +302,6 @@ const SkateApp = (function () {
     gridElement.innerHTML = "";
     gridElement.appendChild(fragment);
 
-    // Setup video previews for cards with videos
     const videoCards = gridElement.querySelectorAll(
       ".card[data-has-video='true']"
     );
@@ -318,7 +315,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Create optimized video card HTML with lazy loading
+   * Create video card HTML
    */
   function createVideoCardHTML(video) {
     const hasVideo = video.path && video.path.trim() !== "";
@@ -357,7 +354,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Create video description with performance in mind
+   * Create video description
    */
   function createVideoDescription(video) {
     const types = video.types.join(", ");
@@ -366,14 +363,14 @@ const SkateApp = (function () {
   }
 
   /**
-   * Get image for trick type with fallback
+   * Get image for trick type
    */
   function getImageForTrickType(type) {
     return CONFIG.DEFAULT_IMAGES[type] || CONFIG.DEFAULT_IMAGES.UNKNOWN;
   }
 
   /**
-   * Optimized video preview setup
+   * Setup video preview
    */
   function setupVideoPreview(cardElement, video) {
     const iframe = cardElement.querySelector("iframe");
@@ -382,7 +379,6 @@ const SkateApp = (function () {
     let previewTimeout;
 
     const handleMouseEnter = () => {
-      // Clear any existing timeout
       if (previewTimeout) {
         clearTimeout(previewTimeout);
       }
@@ -407,13 +403,11 @@ const SkateApp = (function () {
 
     cardElement.addEventListener("mouseenter", handleMouseEnter);
     cardElement.addEventListener("mouseleave", handleMouseLeave);
-
-    // Click handler for overlay
     cardElement.addEventListener("click", () => openVideoOverlay(video));
   }
 
   /**
-   * Start video preview with error handling
+   * Start video preview
    */
   function startVideoPreview(iframe, video) {
     if (!iframe?.contentWindow || !video.path) return;
@@ -426,7 +420,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Stop video preview with error handling
+   * Stop video preview
    */
   function stopVideoPreview(iframe, video) {
     if (!iframe?.contentWindow || !video.path) return;
@@ -439,25 +433,28 @@ const SkateApp = (function () {
   }
 
   /**
-   * Render navigation dropdowns efficiently
+   * Render navigation dropdowns
    */
   function renderNavigationDropdowns() {
-    const doneVideos = state.allVideos.filter(
-      (video) => video.path && video.path.trim() !== ""
-    );
-    const todoVideos = state.allVideos.filter(
-      (video) => !video.path || video.path.trim() === ""
-    );
+    const videosWithPath = [];
+    const videosWithoutPath = [];
 
-    renderDropdown(elements.dropdownDone, doneVideos);
-    renderDropdown(elements.dropdownTodo, todoVideos);
+    state.allVideos.forEach((video) => {
+      if (video.path && video.path.trim() !== "") {
+        videosWithPath.push(video);
+      } else {
+        videosWithoutPath.push(video);
+      }
+    });
 
-    // Update titles with counts
+    renderDropdown(elements.dropdownDone, videosWithPath);
+    renderDropdown(elements.dropdownTodo, videosWithoutPath);
+
     if (elements.trickDoneTitle) {
-      elements.trickDoneTitle.textContent = `Tricks Done (${doneVideos.length})`;
+      elements.trickDoneTitle.textContent = `Tricks Done (${videosWithPath.length})`;
     }
     if (elements.trickTodoTitle) {
-      elements.trickTodoTitle.textContent = `Tricks Todo (${todoVideos.length})`;
+      elements.trickTodoTitle.textContent = `Tricks Todo (${videosWithoutPath.length})`;
     }
   }
 
@@ -488,45 +485,38 @@ const SkateApp = (function () {
   }
 
   /**
-   * Scroll to and highlight video card in the grid
+   * Scroll to and highlight video card
    */
   function scrollToVideoCard(video) {
-    // Find the video card in the grid
     const videoCard = document.querySelector(`[data-video-id="${video.path}"]`);
     if (!videoCard) return;
 
-    // Find which tab contains this video
     const tabContent = videoCard.closest(".tab-pane");
     if (!tabContent) return;
 
-    // Activate the correct tab first
     const tabId = tabContent.id;
     const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
     if (tabButton && !tabButton.classList.contains("active")) {
-      // Use Bootstrap's tab API to switch tabs
       const tab = new bootstrap.Tab(tabButton);
       tab.show();
     }
 
-    // Wait for tab transition to complete, then scroll
     setTimeout(() => {
-      // Scroll to the video card with smooth behavior
       videoCard.scrollIntoView({
         behavior: "smooth",
         block: "center",
         inline: "nearest",
       });
 
-      // Add temporary highlight effect
       videoCard.classList.add("highlighted");
       setTimeout(() => {
         videoCard.classList.remove("highlighted");
-      }, 3000); // Remove highlight after 3 seconds
-    }, 150); // Wait for tab transition
+      }, 3000);
+    }, 150);
   }
 
   /**
-   * Close the sidebar/offcanvas menu
+   * Close sidebar menu
    */
   function closeSidebar() {
     const offcanvasElement = document.getElementById("offcanvasDarkNavbar");
@@ -539,13 +529,13 @@ const SkateApp = (function () {
   }
 
   /**
-   * Optimized search handler
+   * Search handler
    */
   function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
 
     if (query === "") {
-      renderTabs(); // Reset to show all
+      renderTabs();
       return;
     }
 
@@ -566,22 +556,6 @@ const SkateApp = (function () {
    */
   function setupCarouselControls() {
     if (!elements.highlightedCarousel) return;
-
-    const pauseAllVideos = () => {
-      const iframes = elements.highlightedCarousel.querySelectorAll(
-        'iframe[id^="youtube-"]'
-      );
-      iframes.forEach((iframe) => {
-        try {
-          iframe.contentWindow?.postMessage(
-            '{"event":"command","func":"pauseVideo","args":""}',
-            "*"
-          );
-        } catch (error) {
-          console.warn("Failed to pause video:", error);
-        }
-      });
-    };
 
     const stopAllVideos = () => {
       const iframes = elements.highlightedCarousel.querySelectorAll(
@@ -716,13 +690,12 @@ const SkateApp = (function () {
   }
 
   /**
-   * Close video overlay with cleanup
+   * Close video overlay
    */
   function closeVideoOverlay() {
     const overlay = document.querySelector(".video-overlay");
     if (!overlay) return;
 
-    // Stop video if playing
     if (state.currentOverlayVideo?.path) {
       const iframe = document.getElementById(
         `overlay-youtube-${state.currentOverlayVideo.path}`
@@ -743,7 +716,6 @@ const SkateApp = (function () {
     document.body.classList.remove("video-overlay-active");
     state.currentOverlayVideo = null;
 
-    // Clean up iframe after animation
     setTimeout(() => {
       const container = overlay.querySelector(".video-overlay-video-container");
       if (container) container.innerHTML = "";
@@ -751,7 +723,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Pause all videos for performance
+   * Pause all videos
    */
   function pauseAllVideos() {
     const iframes = document.querySelectorAll('iframe[id^="youtube-"]');
@@ -771,7 +743,6 @@ const SkateApp = (function () {
    * Preload critical resources
    */
   function preloadCriticalResources() {
-    // Preload default images
     Object.values(CONFIG.DEFAULT_IMAGES).forEach((src) => {
       const link = document.createElement("link");
       link.rel = "preload";
@@ -793,7 +764,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Optimized debounce function
+   * Debounce function
    */
   function debounce(func, wait) {
     let timeout;
@@ -818,12 +789,11 @@ const SkateApp = (function () {
   }
 
   /**
-   * Enhanced error handling
+   * Error handling
    */
   function handleError(message, error) {
     console.error(`SkateApp Error: ${message}`, error);
 
-    // Show user-friendly error message
     const errorDiv = document.createElement("div");
     errorDiv.className = "alert alert-danger";
     errorDiv.textContent = "Something went wrong. Please refresh the page.";
@@ -833,14 +803,11 @@ const SkateApp = (function () {
   }
 
   /**
-   * Cleanup function for memory management
+   * Cleanup for memory management
    */
   function cleanup() {
-    // Clear all timeouts
     previewTimeouts.forEach((timeout) => clearTimeout(timeout));
     previewTimeouts.clear();
-
-    // Pause all videos
     pauseAllVideos();
   }
 
