@@ -1,0 +1,26 @@
+[
+{
+    "title": "Backside 50-50",
+    "path": "pEZ9aa7sggo",
+    "types": ["NORMAL"],
+    "dateAndPlace": [{ "date": "2025-06-12", "place": "?" }]
+  },
+  {
+    "title": "Switch Backside 50-50",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2025-06-1", "place": "?" }]
+  },
+  {
+    "title": "Fakie Backside 50-50",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2025-06-1", "place": "?" }]
+  },
+  {
+    "title": "Nollie Backside 50-50",
+    "path": "",
+    "types": ["NOLLIE"],
+    "dateAndPlace": [{ "date": "2025-06-1", "place": "?" }]
+  }
+]
