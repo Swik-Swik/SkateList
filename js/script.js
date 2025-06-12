@@ -11,6 +11,8 @@ const SkateApp = (function () {
     API_ENDPOINTS: {
       VIDEOS: "json/videos.json",
       TODO: "json/todo.json",
+      GRINDS: "json/grinds.json",
+      OTHER: "json/other.json",
     },
     YOUTUBE_BASE_URL: "https://www.youtube.com/embed/",
     CAROUSEL_FEATURED_COUNT: 5,
@@ -28,6 +30,8 @@ const SkateApp = (function () {
   let state = {
     allVideos: [],
     todoTricks: [],
+    grindsVideos: [],
+    otherVideos: [],
     carouselVideos: [],
     currentOverlayVideo: null,
     isLoading: false,
@@ -86,26 +90,43 @@ const SkateApp = (function () {
    */
   async function loadData() {
     try {
-      const [videosResponse, todosResponse] = await Promise.all([
-        fetch(CONFIG.API_ENDPOINTS.VIDEOS),
-        fetch(CONFIG.API_ENDPOINTS.TODO),
-      ]);
+      const [videosResponse, todosResponse, grindsResponse, otherResponse] =
+        await Promise.all([
+          fetch(CONFIG.API_ENDPOINTS.VIDEOS),
+          fetch(CONFIG.API_ENDPOINTS.TODO),
+          fetch(CONFIG.API_ENDPOINTS.GRINDS),
+          fetch(CONFIG.API_ENDPOINTS.OTHER),
+        ]);
 
-      if (!videosResponse.ok || !todosResponse.ok) {
+      if (
+        !videosResponse.ok ||
+        !todosResponse.ok ||
+        !grindsResponse.ok ||
+        !otherResponse.ok
+      ) {
         throw new Error("Failed to fetch data from server");
       }
 
-      const [videos, todos] = await Promise.all([
+      const [videos, todos, grinds, other] = await Promise.all([
         videosResponse.json(),
         todosResponse.json(),
+        grindsResponse.json(),
+        otherResponse.json(),
       ]);
 
-      if (!Array.isArray(videos) || !Array.isArray(todos)) {
+      if (
+        !Array.isArray(videos) ||
+        !Array.isArray(todos) ||
+        !Array.isArray(grinds) ||
+        !Array.isArray(other)
+      ) {
         throw new Error("Invalid data format received");
       }
 
       state.allVideos = videos;
       state.todoTricks = todos;
+      state.grindsVideos = grinds;
+      state.otherVideos = other;
     } catch (error) {
       throw new Error(`Data loading failed: ${error.message}`);
     }
@@ -134,7 +155,7 @@ const SkateApp = (function () {
    */
   function handleVisibilityChange() {
     if (document.hidden) {
-      pauseAllVideos();
+      stopAllVideosExcept();
     }
   }
 
@@ -239,22 +260,43 @@ const SkateApp = (function () {
   function categorizeVideos(videos) {
     const categories = { flatTricks: [], grinds: [], other: [] };
 
-    videos.forEach((video) => {
-      const hasFlipTrick = video.types.some(
-        (type) =>
-          ["FLIPTRICK", "ROTATION", "PIVOT"].includes(type) ||
-          (video.types.length === 1 &&
-            ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(type))
-      );
+    // For flat tricks, filter from the main videos array
+    if (videos === state.allVideos) {
+      videos.forEach((video) => {
+        const hasFlipTrick = video.types.some(
+          (type) =>
+            ["FLIPTRICK", "ROTATION", "PIVOT"].includes(type) ||
+            (video.types.length === 1 &&
+              ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(type))
+        );
 
-      if (hasFlipTrick) {
-        categories.flatTricks.push(video);
-      } else if (video.types.includes("GRIND")) {
-        categories.grinds.push(video);
-      } else {
-        categories.other.push(video);
-      }
-    });
+        if (hasFlipTrick) {
+          categories.flatTricks.push(video);
+        }
+      });
+
+      // Use separate JSON data for grinds and other
+      categories.grinds = [...state.grindsVideos];
+      categories.other = [...state.otherVideos];
+    } else {
+      // For search results, categorize as before but include all video types
+      videos.forEach((video) => {
+        const hasFlipTrick = video.types.some(
+          (type) =>
+            ["FLIPTRICK", "ROTATION", "PIVOT"].includes(type) ||
+            (video.types.length === 1 &&
+              ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(type))
+        );
+
+        if (hasFlipTrick) {
+          categories.flatTricks.push(video);
+        } else if (video.types.includes("GRIND")) {
+          categories.grinds.push(video);
+        } else {
+          categories.other.push(video);
+        }
+      });
+    }
 
     // Sort each category: videos with paths first, then videos without paths
     const sortVideos = (videoArray) => {
@@ -305,7 +347,13 @@ const SkateApp = (function () {
     );
     videoCards.forEach((card) => {
       const videoId = card.dataset.videoId;
-      const video = state.allVideos.find((v) => v.path === videoId);
+      // Search in all video arrays
+      const allCombinedVideos = [
+        ...state.allVideos,
+        ...state.grindsVideos,
+        ...state.otherVideos,
+      ];
+      const video = allCombinedVideos.find((v) => v.path === videoId);
       if (video) {
         setupVideoPreview(card, video);
       }
@@ -383,9 +431,15 @@ const SkateApp = (function () {
       isPlaying = !isPlaying;
 
       if (isPlaying) {
-        intentionallyPlayingVideos.add(video.path);
-        iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
-        cardElement.classList.add("video-playing");
+        // Stop only the videos that are currently playing
+        stopAllVideosExcept(video.path);
+
+        // Short delay to ensure other videos are stopped
+        setTimeout(() => {
+          intentionallyPlayingVideos.add(video.path);
+          iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
+          cardElement.classList.add("video-playing");
+        }, 50);
       } else {
         intentionallyPlayingVideos.delete(video.path);
         iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1`;
@@ -414,7 +468,14 @@ const SkateApp = (function () {
     const videosWithPath = [];
     const videosWithoutPath = [];
 
-    state.allVideos.forEach((video) => {
+    // Combine all videos from all JSON files
+    const allCombinedVideos = [
+      ...state.allVideos,
+      ...state.grindsVideos,
+      ...state.otherVideos,
+    ];
+
+    allCombinedVideos.forEach((video) => {
       if (video.path && video.path.trim() !== "") {
         videosWithPath.push(video);
       } else {
@@ -538,7 +599,14 @@ const SkateApp = (function () {
       return;
     }
 
-    const filteredVideos = state.allVideos.filter(
+    // Combine all videos for search
+    const allVideosForSearch = [
+      ...state.allVideos,
+      ...state.grindsVideos,
+      ...state.otherVideos,
+    ];
+
+    const filteredVideos = allVideosForSearch.filter(
       (video) =>
         video.title.toLowerCase().includes(query) ||
         video.types.some((type) => type.toLowerCase().includes(query))
@@ -556,34 +624,19 @@ const SkateApp = (function () {
   function setupCarouselControls() {
     if (!elements.highlightedCarousel) return;
 
-    const stopAllVideos = () => {
-      const iframes = elements.highlightedCarousel.querySelectorAll(
-        'iframe[id^="youtube-"]'
-      );
-      iframes.forEach((iframe) => {
-        try {
-          iframe.contentWindow?.postMessage(
-            '{"event":"command","func":"stopVideo","args":""}',
-            "*"
-          );
-        } catch (error) {
-          console.warn("Failed to stop video:", error);
-        }
-      });
-    };
-
     elements.highlightedCarousel.addEventListener(
       "slide.bs.carousel",
       (event) => {
-        pauseAllVideos();
+        // Stop only playing videos when carousel slides change
+        stopAllVideosExcept();
         updateCarouselTitle(event.to);
       }
     );
 
-    elements.highlightedCarousel.addEventListener(
-      "slid.bs.carousel",
-      stopAllVideos
-    );
+    elements.highlightedCarousel.addEventListener("slid.bs.carousel", () => {
+      // Additional cleanup after slide transition
+      stopAllVideosExcept();
+    });
   }
 
   /**
@@ -641,6 +694,8 @@ const SkateApp = (function () {
    * Open video overlay
    */
   function openVideoOverlay(video) {
+    console.log("Opening video overlay for:", video.title, video.path);
+
     const overlay = document.querySelector(".video-overlay");
     const container = overlay.querySelector(".video-overlay-video-container");
     const info = overlay.querySelector(".video-overlay-info");
@@ -653,17 +708,27 @@ const SkateApp = (function () {
     container.innerHTML = "";
 
     if (video.path && video.path.trim() !== "") {
-      const iframe = document.createElement("iframe");
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
-      iframe.setAttribute("allowfullscreen", "");
-      iframe.setAttribute("frameborder", "0");
-      iframe.setAttribute("allow", "autoplay; encrypted-media");
-      iframe.setAttribute("id", `overlay-youtube-${video.path}`);
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
+      // Stop only the videos that are currently playing
+      stopAllVideosExcept(video.path);
 
-      container.appendChild(iframe);
+      // Short delay to ensure videos are stopped
+      setTimeout(() => {
+        console.log("Creating overlay iframe for:", video.path);
+        const iframe = document.createElement("iframe");
+        iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
+        iframe.setAttribute("allowfullscreen", "");
+        iframe.setAttribute("frameborder", "0");
+        iframe.setAttribute("allow", "autoplay; encrypted-media");
+        iframe.setAttribute("id", `overlay-youtube-${video.path}`);
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+
+        container.appendChild(iframe);
+        console.log("Overlay iframe created and added");
+      }, 50);
     } else {
+      // Even for videos without paths, stop playing videos
+      stopAllVideosExcept();
       container.innerHTML = createPlaceholderHTML(video);
     }
 
@@ -725,26 +790,72 @@ const SkateApp = (function () {
   }
 
   /**
-   * Pause all videos
+   * Stop all videos except the specified one (based on working pauseAllVideos)
    */
-  function pauseAllVideos() {
-    const iframes = document.querySelectorAll('iframe[id^="youtube-"]');
-    iframes.forEach((iframe) => {
-      const videoId = iframe.id.replace("youtube-", "");
+  function stopAllVideosExcept(excludeVideoId = null) {
+    console.log("Stopping all videos except:", excludeVideoId);
 
-      if (intentionallyPlayingVideos.has(videoId)) {
+    // Get all video iframes (both regular and overlay)
+    const iframes = document.querySelectorAll(
+      'iframe[id^="youtube-"], iframe[id^="overlay-youtube-"]'
+    );
+
+    iframes.forEach((iframe) => {
+      const videoId = iframe.id
+        .replace("youtube-", "")
+        .replace("overlay-youtube-", "");
+
+      // Skip the video we want to keep playing
+      if (excludeVideoId && videoId === excludeVideoId) {
+        console.log("Skipping excluded video:", videoId);
         return;
       }
 
       try {
+        // Send both pause and stop commands for better reliability
         iframe.contentWindow?.postMessage(
           '{"event":"command","func":"pauseVideo","args":""}',
           "*"
         );
+        iframe.contentWindow?.postMessage(
+          '{"event":"command","func":"stopVideo","args":""}',
+          "*"
+        );
+
+        // Reset iframe src to remove autoplay and reset to beginning
+        const baseUrl = `${CONFIG.YOUTUBE_BASE_URL}${videoId}?enablejsapi=1&rel=0&modestbranding=1`;
+        if (iframe.src.includes("autoplay=1")) {
+          iframe.src = baseUrl;
+          console.log("Reset iframe src for:", videoId);
+        }
       } catch (error) {
-        console.warn("Failed to pause video:", error);
+        console.warn("Failed to stop video:", videoId, error);
       }
     });
+
+    // Reset all video cards to non-playing state (except excluded)
+    const videoCards = document.querySelectorAll(".video-card");
+    videoCards.forEach((card) => {
+      if (!excludeVideoId || card.dataset.videoId !== excludeVideoId) {
+        card.classList.remove("video-playing");
+      }
+    });
+
+    // Update intentionally playing videos
+    if (excludeVideoId) {
+      const wasIntentional = intentionallyPlayingVideos.has(excludeVideoId);
+      intentionallyPlayingVideos.clear();
+      if (wasIntentional) {
+        intentionallyPlayingVideos.add(excludeVideoId);
+      }
+    } else {
+      intentionallyPlayingVideos.clear();
+    }
+
+    console.log(
+      "Videos stopped. Remaining intentionally playing:",
+      Array.from(intentionallyPlayingVideos)
+    );
   }
 
   /**
@@ -815,7 +926,7 @@ const SkateApp = (function () {
    */
   function cleanup() {
     intentionallyPlayingVideos.clear();
-    pauseAllVideos();
+    stopAllVideosExcept();
   }
 
   // Public API
