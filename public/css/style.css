@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
   padding-top: 70px;
   background-color: #121212;
@@ -75,8 +76,8 @@ h6 {
   padding: 2rem 0;
 }
 .logo-intro-section .main-logo {
-  width: 37.5vw;
-  max-width: 450px;
+  width: min(25vw, 350px);
+  max-width: 350px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -271,6 +272,23 @@ h6 {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
   border: 2px solid #ffffff;
+}
+.card.video-card.video-playing {
+  border: 2px solid #ff6b6b;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+}
+.card.video-card.video-playing::after {
+  content: "▶ PLAYING";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  z-index: 10;
 }
 .card-img-wrapper {
   height: 250px;
@@ -496,7 +514,21 @@ h6 {
   font-size: 0.9rem;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 1200px) {
+  .search-tabs-container .search-form {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 280px;
+    max-width: 380px;
+  }
+  .logo-intro-section .main-logo {
+    width: min(25vw, 350px);
+    max-width: 350px;
+  }
+}
+@media (max-width: 1199px) {
   .search-tabs-container {
     flex-direction: column;
     align-items: center;
@@ -539,8 +571,8 @@ h6 {
 }
 @media (max-width: 768px) {
   .logo-intro-section .main-logo {
-    width: 45vw;
-    max-width: 300px;
+    width: min(40vw, 280px);
+    max-width: 280px;
   }
   .card-img-wrapper,
   .card iframe,
@@ -568,8 +600,8 @@ h6 {
 }
 @media (max-width: 576px) {
   .logo-intro-section .main-logo {
-    width: 60vw;
-    max-width: 240px;
+    width: min(55vw, 220px);
+    max-width: 220px;
   }
   .card-img-wrapper,
   .card iframe,
@@ -621,12 +653,6 @@ h6 {
     width: 38px;
     height: 34px;
     padding: 5px 7px;
-  }
-}
-@media (max-width: 767px) {
-  .main-section .container .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
-    flex: 0 0 100%;
-    max-width: 100%;
   }
 }
 .offcanvas.text-bg-dark {

@@ -1,10 +1,6 @@
-// SkateList SCSS - Optimized for performance and maintainability
+// SkateList SCSS
 
-// =============================================================================
-// VARIABLES & CONFIGURATION
-// =============================================================================
-
-// Color system - Dark theme optimized for video content
+// Colors
 $color-bg-main: #121212;
 $color-bg-surface: #1e1e1e;
 $color-bg-navbar: #181818;
@@ -15,7 +11,7 @@ $color-text-secondary: #aaaaaa;
 $color-text-inactive: #888888;
 $color-accent: #ffffff;
 
-// Layout constants
+// Layout
 $navbar-height: 70px;
 $card-image-height: 250px;
 $card-image-height-tablet: 200px;
@@ -29,18 +25,17 @@ $font-weight-semibold: 600;
 $font-size-large: 1.1rem;
 $font-size-small: 0.9rem;
 
-// Performance-optimized transitions
+// Transitions
 $transition-base: 0.2s ease-in-out;
 $transition-video-expand: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-// Responsive breakpoints
+// Breakpoints
+$breakpoint-desktop: 1200px;
+$breakpoint-laptop: 992px;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
-// =============================================================================
-// MIXINS
-// =============================================================================
-
+// Mixins
 @mixin flex-center {
   display: flex;
   justify-content: center;
@@ -61,17 +56,13 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// =============================================================================
-// BASE STYLES
-// =============================================================================
-
+// Base styles
 body {
   padding-top: $navbar-height;
   background-color: $color-bg-main;
   color: $color-text-primary;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  // Prevent scrolling when video overlay is active
   &.video-overlay-active {
     overflow: hidden;
   }
@@ -87,10 +78,7 @@ h6 {
   margin-bottom: 1rem;
 }
 
-// =============================================================================
-// NAVIGATION
-// =============================================================================
-
+// Navigation
 .navbar {
   &.navbar-dark {
     background: linear-gradient(
@@ -155,18 +143,15 @@ h6 {
   }
 }
 
-// =============================================================================
-// PAGE SECTIONS
-// =============================================================================
-
+// Page sections
 .logo-intro-section {
   @include section-base;
   border-bottom-width: 2px;
   padding: $section-padding;
 
   .main-logo {
-    width: 37.5vw;
-    max-width: 450px;
+    width: min(25vw, 350px);
+    max-width: 350px;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -183,7 +168,6 @@ h6 {
     margin-bottom: 2rem;
   }
 
-  // Smooth title transitions
   #carousel-title {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   }
@@ -214,7 +198,6 @@ h6 {
       }
     }
 
-    // Navigation arrows
     &-control-prev,
     &-control-next {
       width: 5%;
@@ -259,10 +242,7 @@ h6 {
   position: relative;
 }
 
-// =============================================================================
-// SEARCH & TABS - Integrated design for performance
-// =============================================================================
-
+// Search & tabs
 .search-tabs-container {
   position: relative;
   display: flex;
@@ -270,7 +250,6 @@ h6 {
   justify-content: center;
   border-bottom: 2px solid $color-border;
 
-  // Search positioned separately, aligned with tab titles
   .search-form {
     position: absolute;
     left: 0;
@@ -346,11 +325,7 @@ h6 {
   }
 }
 
-// =============================================================================
-// CARDS & VIDEO CONTENT
-// =============================================================================
-
-// Empty state styling for tabs with no content
+// Cards & video content
 .empty-state {
   @include flex-center;
   min-height: 300px;
@@ -377,7 +352,6 @@ h6 {
   background-color: $color-bg-surface;
   cursor: pointer;
 
-  // Enhanced hover for video cards
   &.video-card {
     transition: transform $transition-base, box-shadow $transition-base;
 
@@ -390,12 +364,30 @@ h6 {
       }
     }
 
-    // Highlight effect for dropdown selection
     &.highlighted {
       animation: highlightPulse 3s ease-in-out;
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 0 30px rgba($color-accent, 0.6);
       border: 2px solid $color-accent;
+    }
+
+    &.video-playing {
+      border: 2px solid #ff6b6b;
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+
+      &::after {
+        content: "▶ PLAYING";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 107, 107, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        z-index: 10;
+      }
     }
   }
 
@@ -418,7 +410,6 @@ h6 {
     }
   }
 
-  // YouTube iframes - optimized for performance
   iframe {
     width: 100%;
     height: $card-image-height;
@@ -451,7 +442,6 @@ h6 {
   }
 }
 
-// Video placeholder for lazy loading
 .video-placeholder {
   @include flex-center;
   height: $card-image-height;
@@ -474,7 +464,6 @@ h6 {
     animation: pulse 2s infinite;
   }
 
-  // Carousel specific styling
   .carousel-item & {
     height: 100%;
   }
@@ -505,10 +494,7 @@ h6 {
   }
 }
 
-// =============================================================================
-// VIDEO OVERLAY SYSTEM - Performance optimized
-// =============================================================================
-
+// Video overlay
 .video-overlay {
   position: fixed;
   top: 0;
@@ -651,12 +637,26 @@ h6 {
   }
 }
 
-// =============================================================================
-// RESPONSIVE DESIGN - Mobile-first approach
-// =============================================================================
+// Responsive design
+@media (min-width: 1200px) {
+  .search-tabs-container {
+    .search-form {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 280px;
+      max-width: 380px;
+    }
+  }
 
-// Fix overlap when Bootstrap grid switches to 2 columns (991px breakpoint)
-@media (max-width: 991px) {
+  .logo-intro-section .main-logo {
+    width: min(25vw, 350px);
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 1199px) {
   .search-tabs-container {
     flex-direction: column;
     align-items: center;
@@ -704,11 +704,10 @@ h6 {
   }
 }
 
-// Tablet optimizations
 @media (max-width: $breakpoint-tablet) {
   .logo-intro-section .main-logo {
-    width: 45vw;
-    max-width: 300px;
+    width: min(40vw, 280px);
+    max-width: 280px;
   }
 
   .card-img-wrapper,
@@ -742,11 +741,10 @@ h6 {
   }
 }
 
-// Mobile optimizations
 @media (max-width: $breakpoint-mobile) {
   .logo-intro-section .main-logo {
-    width: 60vw;
-    max-width: 240px;
+    width: min(55vw, 220px);
+    max-width: 220px;
   }
 
   .card-img-wrapper,
@@ -760,7 +758,6 @@ h6 {
     font-size: $font-size-small;
   }
 
-  // Force single column layout
   .container .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
     flex: 0 0 100%;
     max-width: 100%;
@@ -819,18 +816,7 @@ h6 {
   }
 }
 
-// Ensure single column on all mobile devices
-@media (max-width: 767px) {
-  .main-section .container .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-}
-
-// =============================================================================
-// OFFCANVAS SIDEBAR
-// =============================================================================
-
+// Offcanvas sidebar
 .offcanvas {
   &.text-bg-dark {
     background-color: $color-bg-surface !important;
@@ -892,7 +878,6 @@ h6 {
       }
     }
 
-    // Dropdown styling with performance considerations
     .dropdown-menu {
       background-color: $color-bg-surface;
       border: 1px solid $color-border;
@@ -921,7 +906,6 @@ h6 {
         }
       }
 
-      // Custom scrollbar
       &::-webkit-scrollbar {
         width: 6px;
       }

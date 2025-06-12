@@ -14,8 +14,6 @@ const SkateApp = (function () {
     },
     YOUTUBE_BASE_URL: "https://www.youtube.com/embed/",
     CAROUSEL_FEATURED_COUNT: 5,
-    VIDEO_PREVIEW_DELAY: 2000,
-    VIDEO_PREVIEW_STOP_DELAY: 100,
     OVERLAY_ANIMATION_DURATION: 300,
     DEFAULT_IMAGES: {
       NORMAL: "./images/normal.jpg",
@@ -39,7 +37,7 @@ const SkateApp = (function () {
   const elements = {};
 
   // Performance observers
-  let previewTimeouts = new Map();
+  let intentionallyPlayingVideos = new Set();
 
   /**
    * Initialize application
@@ -370,66 +368,43 @@ const SkateApp = (function () {
   }
 
   /**
-   * Setup video preview
+   * Setup video preview with enhanced click handling
    */
   function setupVideoPreview(cardElement, video) {
     const iframe = cardElement.querySelector("iframe");
     if (!iframe || !video.path) return;
 
-    let previewTimeout;
+    let isPlaying = false;
 
-    const handleMouseEnter = () => {
-      if (previewTimeout) {
-        clearTimeout(previewTimeout);
+    const handleDoubleClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      isPlaying = !isPlaying;
+
+      if (isPlaying) {
+        intentionallyPlayingVideos.add(video.path);
+        iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
+        cardElement.classList.add("video-playing");
+      } else {
+        intentionallyPlayingVideos.delete(video.path);
+        iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1`;
+        cardElement.classList.remove("video-playing");
       }
-
-      previewTimeout = setTimeout(() => {
-        startVideoPreview(iframe, video);
-      }, CONFIG.VIDEO_PREVIEW_DELAY);
-
-      previewTimeouts.set(cardElement, previewTimeout);
     };
 
-    const handleMouseLeave = () => {
-      if (previewTimeout) {
-        clearTimeout(previewTimeout);
-        previewTimeouts.delete(cardElement);
+    const handleClick = (e) => {
+      if (e.detail === 1) {
+        setTimeout(() => {
+          if (e.detail === 1) {
+            openVideoOverlay(video);
+          }
+        }, 200);
       }
-
-      setTimeout(() => {
-        stopVideoPreview(iframe, video);
-      }, CONFIG.VIDEO_PREVIEW_STOP_DELAY);
     };
 
-    cardElement.addEventListener("mouseenter", handleMouseEnter);
-    cardElement.addEventListener("mouseleave", handleMouseLeave);
-    cardElement.addEventListener("click", () => openVideoOverlay(video));
-  }
-
-  /**
-   * Start video preview
-   */
-  function startVideoPreview(iframe, video) {
-    if (!iframe?.contentWindow || !video.path) return;
-
-    try {
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&mute=1&rel=0&modestbranding=1`;
-    } catch (error) {
-      console.warn("Failed to start video preview:", error);
-    }
-  }
-
-  /**
-   * Stop video preview
-   */
-  function stopVideoPreview(iframe, video) {
-    if (!iframe?.contentWindow || !video.path) return;
-
-    try {
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1`;
-    } catch (error) {
-      console.warn("Failed to stop video preview:", error);
-    }
+    cardElement.addEventListener("dblclick", handleDoubleClick);
+    cardElement.addEventListener("click", handleClick);
   }
 
   /**
@@ -474,7 +449,6 @@ const SkateApp = (function () {
       button.addEventListener("click", () => {
         openVideoOverlay(video);
         scrollToVideoCard(video);
-        closeSidebar();
       });
       li.appendChild(button);
       fragment.appendChild(li);
@@ -516,15 +490,40 @@ const SkateApp = (function () {
   }
 
   /**
-   * Close sidebar menu
+   * Close sidebar menu - Enhanced for mobile reliability
    */
   function closeSidebar() {
     const offcanvasElement = document.getElementById("offcanvasDarkNavbar");
-    if (offcanvasElement) {
-      const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+    if (!offcanvasElement) return;
+
+    try {
+      // Try to get existing Bootstrap offcanvas instance
+      let offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+
+      // If no instance exists, create one
+      if (!offcanvas) {
+        offcanvas = new bootstrap.Offcanvas(offcanvasElement);
+      }
+
+      // Hide the offcanvas
       if (offcanvas) {
         offcanvas.hide();
       }
+    } catch (error) {
+      // Fallback: manually remove Bootstrap classes if JavaScript API fails
+      console.warn("Bootstrap offcanvas API failed, using fallback:", error);
+      offcanvasElement.classList.remove("show");
+
+      // Remove backdrop if it exists
+      const backdrop = document.querySelector(".offcanvas-backdrop");
+      if (backdrop) {
+        backdrop.remove();
+      }
+
+      // Re-enable body scrolling
+      document.body.classList.remove("modal-open");
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
     }
   }
 
@@ -668,6 +667,9 @@ const SkateApp = (function () {
       container.innerHTML = createPlaceholderHTML(video);
     }
 
+    // Always close sidebar when opening video overlay to prevent blocking on mobile
+    closeSidebar();
+
     overlay.classList.add("active");
     document.body.classList.add("video-overlay-active");
   }
@@ -728,6 +730,12 @@ const SkateApp = (function () {
   function pauseAllVideos() {
     const iframes = document.querySelectorAll('iframe[id^="youtube-"]');
     iframes.forEach((iframe) => {
+      const videoId = iframe.id.replace("youtube-", "");
+
+      if (intentionallyPlayingVideos.has(videoId)) {
+        return;
+      }
+
       try {
         iframe.contentWindow?.postMessage(
           '{"event":"command","func":"pauseVideo","args":""}',
@@ -806,8 +814,7 @@ const SkateApp = (function () {
    * Cleanup for memory management
    */
   function cleanup() {
-    previewTimeouts.forEach((timeout) => clearTimeout(timeout));
-    previewTimeouts.clear();
+    intentionallyPlayingVideos.clear();
     pauseAllVideos();
   }
 

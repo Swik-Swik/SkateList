@@ -1,69 +1,19 @@
-const express = require("express");
-const path = require("path");
-const compression = require("compression");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
+// Static file serving with basic caching
 app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-        imgSrc: ["'self'", "data:", "https:"],
-        fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
-        frameSrc: ["'self'", "https://www.youtube.com"],
-        connectSrc: ["'self'"],
-      },
-    },
-    crossOriginEmbedderPolicy: false,
-  })
-);
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 1000,
-  message: "Too many requests from this IP, please try again later.",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
-
-// Compression middleware
-app.use(
-  compression({
-    level: 6,
-    threshold: 1024,
-    filter: (req, res) => {
-      if (req.headers["x-no-compression"]) {
-        return false;
-      }
-      return compression.filter(req, res);
-    },
-  })
-);
-
-// Static file serving
-app.use(
-  express.static(path.join(__dirname), {
+  express.static(__dirname, {
     maxAge: "1d",
     etag: true,
     lastModified: true,
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith(".json")) {
-        res.setHeader("Cache-Control", "public, max-age=3600");
-      } else if (filePath.match(/\.(css|js)$/)) {
-        res.setHeader("Cache-Control", "public, max-age=86400");
-      } else if (filePath.match(/\.(jpg|jpeg|png|gif|ico|svg)$/)) {
-        res.setHeader("Cache-Control", "public, max-age=604800");
-      }
-    },
   })
 );
 
