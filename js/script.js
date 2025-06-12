@@ -1,13 +1,12 @@
 /**
- * SkateList - Video Showcase Application
- * A modern, maintainable JavaScript application for displaying skateboard trick videos
+ * SkateList - High-Performance Video Showcase Application
+ * Optimized for fast loading and smooth user experience
  */
 
-// Application namespace to avoid global pollution
 const SkateApp = (function () {
   "use strict";
 
-  // Configuration constants
+  // Configuration
   const CONFIG = {
     API_ENDPOINTS: {
       VIDEOS: "json/videos.json",
@@ -15,9 +14,9 @@ const SkateApp = (function () {
     },
     YOUTUBE_BASE_URL: "https://www.youtube.com/embed/",
     CAROUSEL_FEATURED_COUNT: 5,
-    VIDEO_PREVIEW_DELAY: 700,
+    VIDEO_PREVIEW_DELAY: 2000,
     VIDEO_PREVIEW_STOP_DELAY: 100,
-    OVERLAY_ANIMATION_DURATION: 400,
+    OVERLAY_ANIMATION_DURATION: 300,
     DEFAULT_IMAGES: {
       NORMAL: "./images/normal.jpg",
       NOLLIE: "./images/nollie.jpg",
@@ -36,11 +35,14 @@ const SkateApp = (function () {
     isLoading: false,
   };
 
-  // Cache DOM elements
+  // Cached DOM elements
   const elements = {};
 
+  // Performance observers
+  let previewTimeouts = new Map();
+
   /**
-   * Initialize the application
+   * Initialize application with performance optimizations
    */
   async function init() {
     try {
@@ -49,6 +51,7 @@ const SkateApp = (function () {
       await loadData();
       setupEventListeners();
       renderAll();
+      preloadCriticalResources();
     } catch (error) {
       handleError("Failed to initialize application", error);
     } finally {
@@ -57,24 +60,31 @@ const SkateApp = (function () {
   }
 
   /**
-   * Cache frequently used DOM elements
+   * Cache DOM elements once for performance
    */
   function cacheElements() {
-    elements.carouselContent = document.getElementById("carousel-content");
-    elements.carouselTitle = document.getElementById("carousel-title");
-    elements.searchBar = document.getElementById("search-bar");
-    elements.flatTricksGrid = document.getElementById("flatTricksGrid");
-    elements.grindsGrid = document.getElementById("grindsGrid");
-    elements.otherGrid = document.getElementById("otherGrid");
-    elements.dropdownDone = document.getElementById("dropdown-done");
-    elements.dropdownTodo = document.getElementById("dropdown-todo");
-    elements.trickDoneTitle = document.getElementById("trickDoneTitle");
-    elements.trickTodoTitle = document.getElementById("trickTodoTitle");
-    elements.carousel = document.getElementById("highlightedCarousel");
+    const elementIds = [
+      "carousel-content",
+      "carousel-title",
+      "search-bar",
+      "flatTricksGrid",
+      "grindsGrid",
+      "otherGrid",
+      "dropdown-done",
+      "dropdown-todo",
+      "trickDoneTitle",
+      "trickTodoTitle",
+      "highlightedCarousel",
+    ];
+
+    elementIds.forEach((id) => {
+      elements[id.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] =
+        document.getElementById(id);
+    });
   }
 
   /**
-   * Load data from JSON files with proper error handling
+   * Load data with enhanced error handling
    */
   async function loadData() {
     try {
@@ -92,7 +102,6 @@ const SkateApp = (function () {
         todosResponse.json(),
       ]);
 
-      // Validate data structure
       if (!Array.isArray(videos) || !Array.isArray(todos)) {
         throw new Error("Invalid data format received");
       }
@@ -105,26 +114,34 @@ const SkateApp = (function () {
   }
 
   /**
-   * Setup all event listeners
+   * Setup optimized event listeners
    */
   function setupEventListeners() {
-    // Search functionality
     if (elements.searchBar) {
-      elements.searchBar.addEventListener("keyup", debounce(handleSearch, 300));
+      elements.searchBar.addEventListener("keyup", debounce(handleSearch, 250));
     }
 
-    // Carousel controls
     setupCarouselControls();
-
-    // Video overlay
     setupVideoOverlay();
 
     // Cleanup on page unload
     window.addEventListener("beforeunload", cleanup);
+
+    // Handle visibility changes to pause videos when tab is hidden
+    document.addEventListener("visibilitychange", handleVisibilityChange);
   }
 
   /**
-   * Render all components
+   * Handle tab visibility changes for performance
+   */
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      pauseAllVideos();
+    }
+  }
+
+  /**
+   * Render all components with performance optimizations
    */
   function renderAll() {
     renderCarousel();
@@ -133,7 +150,7 @@ const SkateApp = (function () {
   }
 
   /**
-   * Render carousel with featured videos
+   * Render carousel
    */
   function renderCarousel() {
     if (!elements.carouselContent) return;
@@ -164,58 +181,110 @@ const SkateApp = (function () {
    */
   function createCarouselItemHTML(video, isActive) {
     const activeClass = isActive ? "active" : "";
-    const videoElement = createVideoElementHTML(video);
 
     return `
       <div class="carousel-item ${activeClass}" data-video-title="${escapeHtml(
       video.title
-    )}">
-        ${videoElement}
+    )}" data-video-id="${video.path}">
+        ${createCarouselVideoHTML(video)}
       </div>
     `;
   }
 
   /**
-   * Render tabs content
+   * Create video element HTML for carousel
+   */
+  function createCarouselVideoHTML(video) {
+    if (!video.path || video.path.trim() === "") {
+      return createImageHTML(video);
+    }
+
+    return `
+      <iframe
+        src="${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        id="youtube-${video.path}"
+        style="width: 100%; height: 100%;"
+      ></iframe>
+    `;
+  }
+
+  /**
+   * Create static image HTML for videos without paths
+   */
+  function createImageHTML(video) {
+    return `
+      <div class="card-img-wrapper">
+        <img src="${getImageForTrickType(
+          video.types[0]
+        )}" class="card-img-top" alt="${escapeHtml(video.title)}">
+      </div>
+    `;
+  }
+
+  /**
+   * Render tabs with performance optimizations
    */
   function renderTabs() {
     const categorizedVideos = categorizeVideos(state.allVideos);
 
-    renderGrid(elements.flatTricksGrid, categorizedVideos.flatTricks);
-    renderGrid(elements.grindsGrid, categorizedVideos.grinds);
-    renderGrid(elements.otherGrid, categorizedVideos.other);
+    // Use document fragments for better performance
+    renderGridOptimized(elements.flatTricksGrid, categorizedVideos.flatTricks);
+    renderGridOptimized(elements.grindsGrid, categorizedVideos.grinds);
+    renderGridOptimized(elements.otherGrid, categorizedVideos.other);
   }
 
   /**
-   * Categorize videos by type
+   * Categorize videos efficiently
    */
   function categorizeVideos(videos) {
-    const flatTricks = videos.filter((video) =>
-      video.types.some(
+    const categories = { flatTricks: [], grinds: [], other: [] };
+
+    videos.forEach((video) => {
+      const hasFlipTrick = video.types.some(
         (type) =>
           ["FLIPTRICK", "ROTATION", "PIVOT"].includes(type) ||
           (video.types.length === 1 &&
             ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(type))
-      )
-    );
+      );
 
-    const grinds = videos.filter((video) =>
-      video.types.some((type) => type.toLowerCase().includes("grind"))
-    );
+      if (hasFlipTrick) {
+        categories.flatTricks.push(video);
+      } else if (video.types.includes("GRIND")) {
+        categories.grinds.push(video);
+      } else {
+        categories.other.push(video);
+      }
+    });
 
-    const other = videos.filter(
-      (video) => !flatTricks.includes(video) && !grinds.includes(video)
-    );
+    // Sort each category: videos with paths first, then videos without paths
+    const sortVideos = (videoArray) => {
+      return videoArray.sort((a, b) => {
+        const aHasVideo = a.path && a.path.trim() !== "";
+        const bHasVideo = b.path && b.path.trim() !== "";
 
-    return { flatTricks, grinds, other };
+        if (aHasVideo && !bHasVideo) return -1;
+        if (!aHasVideo && bHasVideo) return 1;
+        return 0;
+      });
+    };
+
+    categories.flatTricks = sortVideos(categories.flatTricks);
+    categories.grinds = sortVideos(categories.grinds);
+    categories.other = sortVideos(categories.other);
+
+    return categories;
   }
 
   /**
-   * Render grid with videos
+   * Optimized grid rendering with document fragments
    */
-  function renderGrid(gridElement, videos) {
+  function renderGridOptimized(gridElement, videos) {
     if (!gridElement) return;
 
+    // Handle empty state
     if (videos.length === 0) {
       gridElement.innerHTML = createEmptyStateHTML(
         "No tricks in this category yet"
@@ -223,395 +292,373 @@ const SkateApp = (function () {
       return;
     }
 
-    // Sort videos: ones with paths first
-    const sortedVideos = [...videos].sort((a, b) => {
-      if (a.path && !b.path) return -1;
-      if (!a.path && b.path) return 1;
-      return 0;
+    const fragment = document.createDocumentFragment();
+
+    videos.forEach((video) => {
+      const col = document.createElement("div");
+      col.className = "col";
+      col.innerHTML = createVideoCardHTML(video);
+      fragment.appendChild(col);
     });
 
-    const gridHTML = sortedVideos
-      .map((video) => createVideoCardHTML(video))
-      .join("");
+    gridElement.innerHTML = "";
+    gridElement.appendChild(fragment);
 
-    gridElement.innerHTML = gridHTML;
-
-    // Setup event listeners for cards
-    setupVideoCardListeners(gridElement);
+    // Setup video previews for cards with videos
+    const videoCards = gridElement.querySelectorAll(
+      ".card[data-has-video='true']"
+    );
+    videoCards.forEach((card) => {
+      const videoId = card.dataset.videoId;
+      const video = state.allVideos.find((v) => v.path === videoId);
+      if (video) {
+        setupVideoPreview(card, video);
+      }
+    });
   }
 
   /**
-   * Create video card HTML
+   * Create optimized video card HTML with lazy loading
    */
   function createVideoCardHTML(video) {
     const hasVideo = video.path && video.path.trim() !== "";
-    const cardClass = hasVideo ? "card h-100 video-card" : "card h-100";
-    const mediaElement = createVideoElementHTML(video);
 
     return `
-      <div class="col" id="${escapeHtml(video.title)}">
-        <div class="${cardClass}" 
-             data-video-title="${escapeHtml(video.title)}"
-             data-video-path="${escapeHtml(video.path || "")}"
-             data-video-types="${escapeHtml(video.types.join(", "))}">
-          ${mediaElement}
-          <div class="card-body">
-            <h5 class="card-title">${escapeHtml(video.title)}</h5>
-            <p class="card-text">${escapeHtml(video.types.join(", "))}</p>
-          </div>
+      <div class="card video-card h-100" data-video-id="${video.path}" ${
+      hasVideo ? 'data-has-video="true"' : ""
+    }>
+        ${hasVideo ? createVideoIframeHTML(video) : createImageHTML(video)}
+        <div class="card-body">
+          <h5 class="card-title">${escapeHtml(video.title)}</h5>
+          <p class="card-text">${createVideoDescription(video)}</p>
         </div>
       </div>
     `;
   }
 
   /**
-   * Create video element HTML (iframe or image)
+   * Create video iframe HTML directly
    */
-  function createVideoElementHTML(video) {
-    if (video.path && video.path.trim() !== "") {
-      const youtubeId = escapeHtml(video.path);
-      return `
-        <iframe 
-          src="${CONFIG.YOUTUBE_BASE_URL}${youtubeId}?mute=1&controls=0&loop=0&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1"
-          allowfullscreen
-          frameborder="0"
-          id="youtube-${youtubeId}"
-          loading="lazy">
-        </iframe>
-      `;
-    } else {
-      const imageUrl = getImageForTrickType(video.types[0]);
-      return `
-        <div class="card-img-wrapper">
-          <img class="card-img-top" 
-               src="${imageUrl}" 
-               alt="${escapeHtml(video.title)}"
-               loading="lazy">
-        </div>
-      `;
+  function createVideoIframeHTML(video) {
+    if (!video.path || video.path.trim() === "") {
+      return createImageHTML(video);
     }
+
+    return `
+      <iframe
+        src="${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        id="youtube-${video.path}"
+        style="width: 100%; height: 250px;"
+      ></iframe>
+    `;
   }
 
   /**
-   * Get image URL for trick type
+   * Create video description with performance in mind
+   */
+  function createVideoDescription(video) {
+    const types = video.types.join(", ");
+    const dateInfo = video.dateAndPlace?.[0];
+    return dateInfo ? `${types} - ${dateInfo.date}` : types;
+  }
+
+  /**
+   * Get image for trick type with fallback
    */
   function getImageForTrickType(type) {
     return CONFIG.DEFAULT_IMAGES[type] || CONFIG.DEFAULT_IMAGES.UNKNOWN;
   }
 
   /**
-   * Setup video card event listeners
-   */
-  function setupVideoCardListeners(gridElement) {
-    const cards = gridElement.querySelectorAll(".card");
-
-    cards.forEach((card) => {
-      const videoTitle = card.dataset.videoTitle;
-      const video = state.allVideos.find((v) => v.title === videoTitle);
-
-      if (video) {
-        // Click handler for overlay
-        card.addEventListener("click", (e) => {
-          e.stopPropagation();
-          openVideoOverlay(video);
-        });
-
-        // Hover preview for video cards
-        if (video.path && video.path.trim() !== "") {
-          setupVideoPreview(card, video);
-        }
-      }
-    });
-  }
-
-  /**
-   * Setup video preview on hover
+   * Optimized video preview setup
    */
   function setupVideoPreview(cardElement, video) {
     const iframe = cardElement.querySelector("iframe");
-    if (!iframe) return;
+    if (!iframe || !video.path) return;
 
-    let hoverTimeout, leaveTimeout;
-    let isHovered = false,
-      isPlaying = false;
+    let previewTimeout;
 
     const handleMouseEnter = () => {
-      isHovered = true;
-      clearTimeout(leaveTimeout);
+      // Clear any existing timeout
+      if (previewTimeout) {
+        clearTimeout(previewTimeout);
+      }
 
-      hoverTimeout = setTimeout(() => {
-        if (isHovered && !isPlaying) {
-          startVideoPreview(iframe, video);
-          isPlaying = true;
-        }
+      previewTimeout = setTimeout(() => {
+        startVideoPreview(iframe, video);
       }, CONFIG.VIDEO_PREVIEW_DELAY);
+
+      previewTimeouts.set(cardElement, previewTimeout);
     };
 
     const handleMouseLeave = () => {
-      isHovered = false;
-      clearTimeout(hoverTimeout);
+      if (previewTimeout) {
+        clearTimeout(previewTimeout);
+        previewTimeouts.delete(cardElement);
+      }
 
-      leaveTimeout = setTimeout(() => {
-        if (!isHovered && isPlaying) {
-          stopVideoPreview(iframe, video);
-          isPlaying = false;
-        }
+      setTimeout(() => {
+        stopVideoPreview(iframe, video);
       }, CONFIG.VIDEO_PREVIEW_STOP_DELAY);
     };
 
     cardElement.addEventListener("mouseenter", handleMouseEnter);
     cardElement.addEventListener("mouseleave", handleMouseLeave);
 
-    // Store cleanup functions for later removal
-    cardElement._cleanup = () => {
-      cardElement.removeEventListener("mouseenter", handleMouseEnter);
-      cardElement.removeEventListener("mouseleave", handleMouseLeave);
-      clearTimeout(hoverTimeout);
-      clearTimeout(leaveTimeout);
-    };
+    // Click handler for overlay
+    cardElement.addEventListener("click", () => openVideoOverlay(video));
   }
 
   /**
-   * Start video preview
+   * Start video preview with error handling
    */
   function startVideoPreview(iframe, video) {
-    if (!iframe || !video.path) return;
+    if (!iframe?.contentWindow || !video.path) return;
 
     try {
-      const params = new URLSearchParams({
-        autoplay: "1",
-        mute: "1",
-        controls: "0",
-        loop: "1",
-        vd: "hd1080",
-        enablejsapi: "1",
-        rel: "0",
-        modestbranding: "1",
-        start: "0",
-      });
-
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${
-        video.path
-      }?${params.toString()}`;
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&mute=1&rel=0&modestbranding=1`;
     } catch (error) {
-      console.warn("Could not start video preview:", error);
+      console.warn("Failed to start video preview:", error);
     }
   }
 
   /**
-   * Stop video preview
+   * Stop video preview with error handling
    */
   function stopVideoPreview(iframe, video) {
-    if (!iframe || !video.path) return;
+    if (!iframe?.contentWindow || !video.path) return;
 
     try {
-      const params = new URLSearchParams({
-        mute: "1",
-        controls: "0",
-        loop: "0",
-        vd: "hd1080",
-        enablejsapi: "1",
-        rel: "0",
-        modestbranding: "1",
-      });
-
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${
-        video.path
-      }?${params.toString()}`;
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1`;
     } catch (error) {
-      console.warn("Could not stop video preview:", error);
+      console.warn("Failed to stop video preview:", error);
     }
   }
 
   /**
-   * Render navigation dropdowns
+   * Render navigation dropdowns efficiently
    */
   function renderNavigationDropdowns() {
-    // Tricks done dropdown
-    if (elements.dropdownDone && elements.trickDoneTitle) {
-      const doneItemsHTML = state.allVideos
-        .map(
-          (video) => `
-          <li>
-            <a class="dropdown-item" href="#${escapeHtml(video.title)}">
-              ${escapeHtml(video.title)}
-            </a>
-          </li>
-        `
-        )
-        .join("");
+    const doneVideos = state.allVideos.filter(
+      (video) => video.path && video.path.trim() !== ""
+    );
+    const todoVideos = state.allVideos.filter(
+      (video) => !video.path || video.path.trim() === ""
+    );
 
-      elements.dropdownDone.innerHTML = doneItemsHTML;
-      elements.trickDoneTitle.textContent = `Tricks Done (${state.allVideos.length})`;
+    renderDropdown(elements.dropdownDone, doneVideos);
+    renderDropdown(elements.dropdownTodo, todoVideos);
+
+    // Update titles with counts
+    if (elements.trickDoneTitle) {
+      elements.trickDoneTitle.textContent = `Tricks Done (${doneVideos.length})`;
     }
-
-    // Tricks todo dropdown
-    if (elements.dropdownTodo && elements.trickTodoTitle) {
-      const todoItemsHTML = state.todoTricks
-        .map(
-          (trick) => `
-          <li>
-            <a class="dropdown-item" href="#">
-              ${escapeHtml(trick.name)}
-            </a>
-          </li>
-        `
-        )
-        .join("");
-
-      elements.dropdownTodo.innerHTML = todoItemsHTML;
-      elements.trickTodoTitle.textContent = `Tricks Todo (${state.todoTricks.length})`;
+    if (elements.trickTodoTitle) {
+      elements.trickTodoTitle.textContent = `Tricks Todo (${todoVideos.length})`;
     }
   }
 
   /**
-   * Handle search functionality
+   * Render dropdown with document fragment
+   */
+  function renderDropdown(dropdownElement, videos) {
+    if (!dropdownElement) return;
+
+    const fragment = document.createDocumentFragment();
+
+    videos.forEach((video) => {
+      const li = document.createElement("li");
+      const button = document.createElement("button");
+      button.className = "dropdown-item";
+      button.textContent = video.title;
+      button.addEventListener("click", () => {
+        openVideoOverlay(video);
+        scrollToVideoCard(video);
+        closeSidebar();
+      });
+      li.appendChild(button);
+      fragment.appendChild(li);
+    });
+
+    dropdownElement.innerHTML = "";
+    dropdownElement.appendChild(fragment);
+  }
+
+  /**
+   * Scroll to and highlight video card in the grid
+   */
+  function scrollToVideoCard(video) {
+    // Find the video card in the grid
+    const videoCard = document.querySelector(`[data-video-id="${video.path}"]`);
+    if (!videoCard) return;
+
+    // Find which tab contains this video
+    const tabContent = videoCard.closest(".tab-pane");
+    if (!tabContent) return;
+
+    // Activate the correct tab first
+    const tabId = tabContent.id;
+    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+    if (tabButton && !tabButton.classList.contains("active")) {
+      // Use Bootstrap's tab API to switch tabs
+      const tab = new bootstrap.Tab(tabButton);
+      tab.show();
+    }
+
+    // Wait for tab transition to complete, then scroll
+    setTimeout(() => {
+      // Scroll to the video card with smooth behavior
+      videoCard.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+
+      // Add temporary highlight effect
+      videoCard.classList.add("highlighted");
+      setTimeout(() => {
+        videoCard.classList.remove("highlighted");
+      }, 3000); // Remove highlight after 3 seconds
+    }, 150); // Wait for tab transition
+  }
+
+  /**
+   * Close the sidebar/offcanvas menu
+   */
+  function closeSidebar() {
+    const offcanvasElement = document.getElementById("offcanvasDarkNavbar");
+    if (offcanvasElement) {
+      const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+      if (offcanvas) {
+        offcanvas.hide();
+      }
+    }
+  }
+
+  /**
+   * Optimized search handler
    */
   function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
-    const grids = [
-      elements.flatTricksGrid,
-      elements.grindsGrid,
-      elements.otherGrid,
-    ];
 
-    grids.forEach((grid) => {
-      if (!grid) return;
+    if (query === "") {
+      renderTabs(); // Reset to show all
+      return;
+    }
 
-      const containers = grid.querySelectorAll(".col");
+    const filteredVideos = state.allVideos.filter(
+      (video) =>
+        video.title.toLowerCase().includes(query) ||
+        video.types.some((type) => type.toLowerCase().includes(query))
+    );
 
-      containers.forEach((container) => {
-        const titleElement = container.querySelector(".card-title");
-        const typesElement = container.querySelector(".card-text");
-
-        if (titleElement && typesElement) {
-          const title = titleElement.textContent.toLowerCase();
-          const types = typesElement.textContent.toLowerCase();
-          const isMatch = title.includes(query) || types.includes(query);
-
-          container.style.display = isMatch ? "block" : "none";
-        }
-      });
-    });
+    const categorizedVideos = categorizeVideos(filteredVideos);
+    renderGridOptimized(elements.flatTricksGrid, categorizedVideos.flatTricks);
+    renderGridOptimized(elements.grindsGrid, categorizedVideos.grinds);
+    renderGridOptimized(elements.otherGrid, categorizedVideos.other);
   }
 
   /**
    * Setup carousel controls
    */
   function setupCarouselControls() {
-    if (!elements.carousel) return;
+    if (!elements.highlightedCarousel) return;
 
     const pauseAllVideos = () => {
-      const iframes = elements.carousel.querySelectorAll(
+      const iframes = elements.highlightedCarousel.querySelectorAll(
         'iframe[id^="youtube-"]'
       );
       iframes.forEach((iframe) => {
         try {
-          iframe.contentWindow.postMessage(
+          iframe.contentWindow?.postMessage(
             '{"event":"command","func":"pauseVideo","args":""}',
             "*"
           );
         } catch (error) {
-          console.warn("Could not pause video:", error);
+          console.warn("Failed to pause video:", error);
         }
       });
     };
 
     const stopAllVideos = () => {
-      const iframes = elements.carousel.querySelectorAll(
+      const iframes = elements.highlightedCarousel.querySelectorAll(
         'iframe[id^="youtube-"]'
       );
       iframes.forEach((iframe) => {
         try {
-          iframe.contentWindow.postMessage(
+          iframe.contentWindow?.postMessage(
             '{"event":"command","func":"stopVideo","args":""}',
             "*"
           );
         } catch (error) {
-          console.warn("Could not stop video:", error);
+          console.warn("Failed to stop video:", error);
         }
       });
     };
 
-    elements.carousel.addEventListener("slide.bs.carousel", (event) => {
-      pauseAllVideos();
-      if (elements.carouselTitle) {
-        elements.carouselTitle.classList.add("title-changing");
+    elements.highlightedCarousel.addEventListener(
+      "slide.bs.carousel",
+      (event) => {
+        pauseAllVideos();
+        updateCarouselTitle(event.to);
       }
-    });
+    );
 
-    elements.carousel.addEventListener("slid.bs.carousel", (event) => {
-      stopAllVideos();
-      const activeIndex = Array.from(
-        event.target.querySelectorAll(".carousel-item")
-      ).indexOf(event.relatedTarget);
-      updateCarouselTitle(activeIndex);
-    });
+    elements.highlightedCarousel.addEventListener(
+      "slid.bs.carousel",
+      stopAllVideos
+    );
   }
 
   /**
-   * Update carousel title with animation
+   * Update carousel title
    */
   function updateCarouselTitle(activeIndex) {
     if (!elements.carouselTitle || !state.carouselVideos[activeIndex]) return;
 
     const newTitle = state.carouselVideos[activeIndex].title;
 
-    if (elements.carouselTitle.classList.contains("title-changing")) {
-      setTimeout(() => {
-        elements.carouselTitle.textContent = newTitle;
-        elements.carouselTitle.classList.remove("title-changing");
-        elements.carouselTitle.classList.add("title-changed");
+    elements.carouselTitle.style.opacity = "0";
+    elements.carouselTitle.style.transform = "translateY(-10px)";
 
-        setTimeout(() => {
-          elements.carouselTitle.classList.remove("title-changed");
-        }, 300);
-      }, 150);
-    } else {
+    setTimeout(() => {
       elements.carouselTitle.textContent = newTitle;
-    }
+      elements.carouselTitle.style.opacity = "1";
+      elements.carouselTitle.style.transform = "translateY(0)";
+    }, 150);
   }
 
   /**
-   * Setup video overlay functionality
+   * Setup video overlay
    */
   function setupVideoOverlay() {
-    const overlayHTML = `
-    <div class="video-overlay" id="videoOverlay">
+    const overlay = document.createElement("div");
+    overlay.className = "video-overlay";
+    overlay.innerHTML = `
       <div class="video-overlay-content">
-          <div class="video-overlay-close" id="overlayClose" aria-label="Close video overlay">&times;</div>
-        <div class="video-overlay-video-container" id="overlayVideoContainer"></div>
-        <div class="video-overlay-info" id="overlayInfo">
-          <h3 id="overlayTitle"></h3>
-          <p id="overlayTypes"></p>
-        </div>
+        <button class="video-overlay-close" aria-label="Close video">&times;</button>
+        <div class="video-overlay-video-container"></div>
+        <div class="video-overlay-info">
+          <h3></h3>
+          <p></p>
       </div>
     </div>
   `;
+    document.body.appendChild(overlay);
 
-    document.body.insertAdjacentHTML("beforeend", overlayHTML);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeVideoOverlay();
+    });
 
-    const overlay = document.getElementById("videoOverlay");
-    const closeBtn = document.getElementById("overlayClose");
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", closeVideoOverlay);
-    }
-
-    if (overlay) {
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) {
-          closeVideoOverlay();
-        }
-      });
-    }
+    overlay
+      .querySelector(".video-overlay-close")
+      .addEventListener("click", closeVideoOverlay);
 
     document.addEventListener("keydown", (e) => {
-      if (
-        e.key === "Escape" &&
-        overlay &&
-        overlay.classList.contains("active")
-      ) {
+      if (e.key === "Escape" && overlay.classList.contains("active")) {
         closeVideoOverlay();
       }
     });
@@ -621,111 +668,117 @@ const SkateApp = (function () {
    * Open video overlay
    */
   function openVideoOverlay(video) {
-    const overlay = document.getElementById("videoOverlay");
-    const container = document.getElementById("overlayVideoContainer");
-    const title = document.getElementById("overlayTitle");
-    const types = document.getElementById("overlayTypes");
+    const overlay = document.querySelector(".video-overlay");
+    const container = overlay.querySelector(".video-overlay-video-container");
+    const info = overlay.querySelector(".video-overlay-info");
 
-    if (!overlay || !container || !title || !types) return;
+    state.currentOverlayVideo = video;
 
-    // Set video info
-    title.textContent = video.title;
-    types.textContent = video.types.join(", ");
+    info.querySelector("h3").textContent = video.title;
+    info.querySelector("p").textContent = createVideoDescription(video);
 
-    // Clear previous content
     container.innerHTML = "";
 
-    // Create video content
     if (video.path && video.path.trim() !== "") {
-      const params = new URLSearchParams({
-        autoplay: "1",
-        mute: "0",
-        controls: "1",
-        loop: "1",
-        vd: "hd1080",
-        enablejsapi: "1",
-        rel: "0",
-        modestbranding: "1",
-      });
-
       const iframe = document.createElement("iframe");
-      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${
-        video.path
-      }?${params.toString()}`;
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
       iframe.setAttribute("allowfullscreen", "");
       iframe.setAttribute("frameborder", "0");
       iframe.setAttribute("allow", "autoplay; encrypted-media");
       iframe.setAttribute("id", `overlay-youtube-${video.path}`);
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
 
       container.appendChild(iframe);
     } else {
       container.innerHTML = createPlaceholderHTML(video);
     }
 
-    state.currentOverlayVideo = video;
-    document.body.classList.add("video-overlay-active");
     overlay.classList.add("active");
+    document.body.classList.add("video-overlay-active");
   }
 
   /**
-   * Create placeholder HTML for videos without path
+   * Create placeholder HTML for overlay
    */
   function createPlaceholderHTML(video) {
-    const imageUrl = getImageForTrickType(video.types[0]);
-
     return `
       <div class="video-placeholder">
-        <img class="placeholder-image" 
-             src="${imageUrl}" 
-             alt="${escapeHtml(video.title)}"
-             loading="lazy">
+        <img src="${getImageForTrickType(video.types[0])}" alt="${escapeHtml(
+      video.title
+    )}" class="placeholder-image">
         <div class="placeholder-text">
           <h3>${escapeHtml(video.title)}</h3>
-      <p>Video coming soon...</p>
-      <p>This trick is on the todo list!</p>
+          <p>Video coming soon!</p>
         </div>
       </div>
     `;
   }
 
   /**
-   * Close video overlay
+   * Close video overlay with cleanup
    */
   function closeVideoOverlay() {
-    const overlay = document.getElementById("videoOverlay");
-    if (!overlay || !overlay.classList.contains("active")) return;
+    const overlay = document.querySelector(".video-overlay");
+    if (!overlay) return;
+
+    // Stop video if playing
+    if (state.currentOverlayVideo?.path) {
+      const iframe = document.getElementById(
+        `overlay-youtube-${state.currentOverlayVideo.path}`
+      );
+      if (iframe?.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            '{"event":"command","func":"stopVideo","args":""}',
+            "*"
+          );
+        } catch (error) {
+          console.warn("Failed to stop overlay video:", error);
+        }
+      }
+    }
 
     overlay.classList.remove("active");
     document.body.classList.remove("video-overlay-active");
+    state.currentOverlayVideo = null;
 
+    // Clean up iframe after animation
     setTimeout(() => {
-      if (state.currentOverlayVideo && state.currentOverlayVideo.path) {
-        const iframe = document.getElementById(
-          `overlay-youtube-${state.currentOverlayVideo.path}`
-        );
-        if (iframe) {
-          const params = new URLSearchParams({
-            mute: "1",
-            controls: "1",
-            loop: "1",
-            vd: "hd1080",
-            enablejsapi: "1",
-            rel: "0",
-            modestbranding: "1",
-          });
-          iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${
-            state.currentOverlayVideo.path
-          }?${params.toString()}`;
-        }
-      }
-
-      const container = document.getElementById("overlayVideoContainer");
-      if (container) {
-        container.innerHTML = "";
-      }
-
-      state.currentOverlayVideo = null;
+      const container = overlay.querySelector(".video-overlay-video-container");
+      if (container) container.innerHTML = "";
     }, CONFIG.OVERLAY_ANIMATION_DURATION);
+  }
+
+  /**
+   * Pause all videos for performance
+   */
+  function pauseAllVideos() {
+    const iframes = document.querySelectorAll('iframe[id^="youtube-"]');
+    iframes.forEach((iframe) => {
+      try {
+        iframe.contentWindow?.postMessage(
+          '{"event":"command","func":"pauseVideo","args":""}',
+          "*"
+        );
+      } catch (error) {
+        console.warn("Failed to pause video:", error);
+      }
+    });
+  }
+
+  /**
+   * Preload critical resources
+   */
+  function preloadCriticalResources() {
+    // Preload default images
+    Object.values(CONFIG.DEFAULT_IMAGES).forEach((src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+    });
   }
 
   /**
@@ -733,23 +786,21 @@ const SkateApp = (function () {
    */
   function createEmptyStateHTML(message) {
     return `
-      <div class="col-12">
-        <div class="text-center py-5">
-          <h4 class="text-light">${escapeHtml(message)}</h4>
-        </div>
+      <div class="empty-state">
+        <p>${escapeHtml(message)}</p>
       </div>
     `;
   }
 
   /**
-   * Debounce function for performance optimization
+   * Optimized debounce function
    */
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
       const later = () => {
         clearTimeout(timeout);
-        func(...args);
+        func.apply(this, args);
       };
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
@@ -757,64 +808,47 @@ const SkateApp = (function () {
   }
 
   /**
-   * Escape HTML to prevent XSS attacks
+   * XSS protection
    */
   function escapeHtml(text) {
     if (typeof text !== "string") return "";
-
-    const map = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
-    };
-
-    return text.replace(/[&<>"']/g, (m) => map[m]);
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   /**
-   * Handle errors gracefully
+   * Enhanced error handling
    */
   function handleError(message, error) {
-    console.error(`${message}:`, error);
+    console.error(`SkateApp Error: ${message}`, error);
 
     // Show user-friendly error message
-    const errorHTML = `
-      <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Oops! Something went wrong</h4>
-        <p>${escapeHtml(message)}</p>
-        <hr>
-        <p class="mb-0">Please refresh the page and try again.</p>
-      </div>
-    `;
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "alert alert-danger";
+    errorDiv.textContent = "Something went wrong. Please refresh the page.";
+    document.body.insertBefore(errorDiv, document.body.firstChild);
 
-    document.body.insertAdjacentHTML("afterbegin", errorHTML);
+    setTimeout(() => errorDiv.remove(), 5000);
   }
 
   /**
-   * Cleanup function to prevent memory leaks
+   * Cleanup function for memory management
    */
   function cleanup() {
-    // Clean up video preview listeners
-    document.querySelectorAll(".video-card").forEach((card) => {
-      if (card._cleanup) {
-        card._cleanup();
-      }
-    });
+    // Clear all timeouts
+    previewTimeouts.forEach((timeout) => clearTimeout(timeout));
+    previewTimeouts.clear();
 
-    // Clear timeouts and intervals
-    state.currentOverlayVideo = null;
+    // Pause all videos
+    pauseAllVideos();
   }
 
   // Public API
-  return {
-    init,
-    cleanup,
-  };
+  return { init };
 })();
 
-// Initialize the application when DOM is ready
+// Initialize when DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", SkateApp.init);
 } else {

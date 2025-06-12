@@ -1,39 +1,42 @@
 {
   "name": "skatelist",
   "version": "1.0.0",
-  "description": "A skateboard tricks showcase application",
+  "description": "High-performance skateboard tricks video showcase",
   "type": "module",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "concurrently \"npm run scss:watch\" \"npm run start\"",
-    "scss": "sass scss/main.scss public/css/style.css",
-    "scss:watch": "sass scss/main.scss public/css/style.css --watch",
-    "build": "npm run scss && npm run minify:js && npm run minify:css",
-    "minify:js": "terser js/script.js -o js/script.min.js --compress --mangle",
-    "minify:css": "cleancss -o public/css/style.min.css public/css/style.css",
-    "clean": "rm -rf js/*.min.js public/css/*.min.css"
+    "dev": "concurrently \"npm run sass:watch\" \"npm run server:dev\"",
+    "start": "NODE_ENV=production node server.js",
+    "server:dev": "nodemon server.js",
+    "sass:build": "sass scss/main.scss:public/css/style.css --style=compressed --no-source-map",
+    "sass:watch": "sass scss/main.scss:public/css/style.css --watch --style=expanded",
+    "build": "npm run sass:build && npm run js:minify",
+    "js:minify": "terser js/script.js -o public/js/script.min.js --compress --mangle",
+    "prestart": "npm run build",
+    "health": "curl -f http://localhost:3001/health || exit 1"
   },
   "keywords": [
     "skateboard",
     "tricks",
-    "video",
-    "showcase"
+    "videos",
+    "showcase",
+    "performance"
   ],
-  "author": "Swik-Swik",
+  "author": "SkateList Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
     "compression": "^1.7.4",
+    "express": "^4.18.2",
     "helmet": "^7.1.0"
   },
   "devDependencies": {
-    "sass": "^1.89.2",
-    "terser": "^5.26.0",
-    "clean-css-cli": "^5.6.2",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "sass": "^1.69.5",
+    "terser": "^5.24.0"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

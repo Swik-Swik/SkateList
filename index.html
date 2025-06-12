@@ -8,7 +8,18 @@
       name="description"
       content="Showcase of skateboard tricks with video demonstrations"
     />
+
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://i.ytimg.com" />
+
+    <!-- Critical resources -->
     <link rel="icon" type="image/x-icon" href="/images/skate.png" />
+    <link rel="preload" href="/images/swik_logo.svg" as="image" />
+    <link rel="preload" href="/css/style.css" as="style" />
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
@@ -28,6 +39,7 @@
             width="60"
             height="60"
             class="d-inline-block align-text-top"
+            loading="eager"
           />
           Skate Tricks
         </a>
@@ -105,7 +117,12 @@
     <section class="logo-intro-section">
       <div class="container-fluid">
         <div class="text-center py-4">
-          <img src="./images/swik_logo.svg" alt="Swik Logo" class="main-logo" />
+          <img
+            src="./images/swik_logo.svg"
+            alt="Swik Logo"
+            class="main-logo"
+            loading="eager"
+          />
         </div>
       </div>
     </section>
@@ -117,7 +134,7 @@
         <div
           id="highlightedCarousel"
           class="carousel slide"
-          data-bs-ride="carousel"
+          data-bs-interval="false"
         >
           <div class="carousel-inner" id="carousel-content">
             <!-- Carousel items will be populated by JavaScript -->
@@ -127,6 +144,7 @@
             type="button"
             data-bs-target="#highlightedCarousel"
             data-bs-slide="prev"
+            aria-label="Previous video"
           >
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
@@ -136,6 +154,7 @@
             type="button"
             data-bs-target="#highlightedCarousel"
             data-bs-slide="next"
+            aria-label="Next video"
           >
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
@@ -157,6 +176,7 @@
               placeholder="Search tricks..."
               aria-label="Search"
               id="search-bar"
+              autocomplete="off"
             />
           </form>
 
@@ -262,7 +282,8 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
       crossorigin="anonymous"
+      defer
     ></script>
-    <script src="js/script.js"></script>
+    <script src="js/script.js" defer></script>
   </body>
 </html>

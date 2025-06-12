@@ -1,31 +1,26 @@
-// =============================================================================
-// SkateList SCSS Stylesheet
-// Dark Theme Skateboarding Video Website
-// =============================================================================
+// SkateList SCSS - Optimized for performance and maintainability
 
 // =============================================================================
-// 1. VARIABLES
+// VARIABLES & CONFIGURATION
 // =============================================================================
 
-// Color Palette
-$color-bg-main: #121212; // Main page background (darkest)
-$color-bg-surface: #1e1e1e; // Surface color for cards, navbar, sections
-$color-bg-navbar: #181818; // Navbar background (subtle darker gray)
-$color-navbar-accent: #2a2a2a; // Navbar accent color (subtle gray)
-$color-border: #333333; // Subtle borders
-$color-text-primary: #f5f5f5; // Primary text, titles
-$color-text-secondary: #aaaaaa; // Secondary, less important text
-$color-text-inactive: #888888; // Inactive tabs or elements
-$color-accent: #ffffff; // Active/hover elements (pure white for high contrast)
+// Color system - Dark theme optimized for video content
+$color-bg-main: #121212;
+$color-bg-surface: #1e1e1e;
+$color-bg-navbar: #181818;
+$color-navbar-accent: #2a2a2a;
+$color-border: #333333;
+$color-text-primary: #f5f5f5;
+$color-text-secondary: #aaaaaa;
+$color-text-inactive: #888888;
+$color-accent: #ffffff;
 
-// Layout & Sizing
+// Layout constants
 $navbar-height: 70px;
 $card-image-height: 250px;
 $card-image-height-tablet: 200px;
 $card-image-height-mobile: 180px;
 $border-radius: 10px;
-
-// Spacing
 $section-padding: 2rem 0;
 $card-padding: 1rem;
 
@@ -34,16 +29,16 @@ $font-weight-semibold: 600;
 $font-size-large: 1.1rem;
 $font-size-small: 0.9rem;
 
-// Transitions
+// Performance-optimized transitions
 $transition-base: 0.2s ease-in-out;
 $transition-video-expand: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-// Breakpoints
+// Responsive breakpoints
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
 // =============================================================================
-// 2. MIXINS
+// MIXINS
 // =============================================================================
 
 @mixin flex-center {
@@ -67,7 +62,7 @@ $breakpoint-mobile: 576px;
 }
 
 // =============================================================================
-// 3. BASE STYLES
+// BASE STYLES
 // =============================================================================
 
 body {
@@ -93,7 +88,7 @@ h6 {
 }
 
 // =============================================================================
-// 4. NAVIGATION
+// NAVIGATION
 // =============================================================================
 
 .navbar {
@@ -108,7 +103,6 @@ h6 {
     min-height: $navbar-height;
     padding: 0.5rem 1rem;
 
-    // Ensure proper alignment
     .container-fluid {
       display: flex;
       align-items: center;
@@ -131,55 +125,6 @@ h6 {
       &:hover {
         color: lighten($color-text-secondary, 20%);
       }
-    }
-
-    // Center search form with proper width
-    form[role="search"] {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-      max-width: 400px;
-      margin: 0 auto;
-
-      .form-control {
-        width: 100%;
-        min-width: 300px;
-        margin: 0;
-        padding: 0.375rem 0.75rem;
-        background-color: rgba($color-bg-surface, 0.9);
-        border: 1px solid rgba($color-navbar-accent, 0.5);
-        color: $color-text-primary;
-        transition: all $transition-base;
-
-        &::placeholder {
-          color: $color-text-secondary;
-        }
-
-        &:focus {
-          background-color: rgba(
-            255,
-            255,
-            255,
-            0.98
-          ); // Almost white background for maximum contrast
-          border-color: $color-accent;
-          box-shadow: 0 0 0 0.25rem rgba($color-accent, 0.5); // Cleaner glow
-          color: #222222; // Dark text on light background for maximum readability
-          outline: 2px solid $color-accent; // Native outline for accessibility
-          outline-offset: 2px; // Space between border and outline
-          transform: translateY(-2px); // Subtle lift
-
-          &::placeholder {
-            color: #555555; // Dark placeholder on light background
-            opacity: 0.8;
-          }
-        }
-      }
-    }
-
-    #search-bar {
-      margin: 0;
     }
 
     .navbar-toggler {
@@ -210,16 +155,10 @@ h6 {
   }
 }
 
-.navbar-interactive-elements {
-  @include flex-center;
-  gap: 1rem;
-}
-
 // =============================================================================
-// 5. PAGE SECTIONS
+// PAGE SECTIONS
 // =============================================================================
 
-// Logo Introduction Section
 .logo-intro-section {
   @include section-base;
   border-bottom-width: 2px;
@@ -234,7 +173,6 @@ h6 {
   }
 }
 
-// Carousel Section
 .carousel-section {
   @include section-base;
   padding: $section-padding;
@@ -245,22 +183,11 @@ h6 {
     margin-bottom: 2rem;
   }
 
-  // Dynamic title animations
+  // Smooth title transitions
   #carousel-title {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-
-    &.title-changing {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-
-    &.title-changed {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
-  // Carousel container
   .carousel {
     max-width: 1200px;
     margin: 0 auto;
@@ -274,14 +201,12 @@ h6 {
     &-item {
       height: 100%;
 
-      // Style for carousel videos
       iframe {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
 
-      // Style for carousel placeholder images
       .card-img-wrapper {
         height: 100%;
         width: 100%;
@@ -327,19 +252,17 @@ h6 {
   }
 }
 
-// Main Content Section
 .main-section {
   padding: $section-padding;
   min-height: 60vh;
   background-color: $color-bg-surface;
-  position: relative; // Add position relative for overlay positioning
+  position: relative;
 }
 
 // =============================================================================
-// 6. TABS & NAVIGATION
+// SEARCH & TABS - Integrated design for performance
 // =============================================================================
 
-// Container for search and tabs at same level
 .search-tabs-container {
   position: relative;
   display: flex;
@@ -347,84 +270,53 @@ h6 {
   justify-content: center;
   border-bottom: 2px solid $color-border;
 
-  // Search form integrated with the separator line
+  // Search positioned separately, aligned with tab titles
   .search-form {
     position: absolute;
     left: 0;
-    bottom: -1px; // Position it to intersect with the border
+    top: 50%;
+    transform: translateY(-50%);
     min-width: 280px;
     max-width: 380px;
     z-index: 2;
 
     .form-control {
-      background-color: lighten(
-        $color-bg-surface,
-        8%
-      ); // Lighter background for better readability
+      background-color: lighten($color-bg-surface, 8%);
       border: 2px solid lighten($color-border, 10%);
       color: $color-text-primary;
       padding: 0.6rem 1.2rem;
-      border-radius: 25px; // Rounded pill shape
+      border-radius: 25px;
       transition: all $transition-base;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       font-size: 0.9rem;
 
       &::placeholder {
-        color: lighten(
-          $color-text-secondary,
-          15%
-        ); // Lighter placeholder for better contrast
+        color: lighten($color-text-secondary, 15%);
         font-style: italic;
       }
 
       &:focus {
-        background-color: lighten(
-          $color-bg-surface,
-          15%
-        ); // Much lighter when focused
+        background-color: #ffffff;
         border-color: $color-accent;
-        box-shadow: 0 0 0 0.2rem rgba($color-accent, 0.4),
-          // Stronger glow
-          0 4px 12px rgba(0, 0, 0, 0.2),
-          inset 0 0 0 1px rgba($color-accent, 0.3); // Inner glow for clarity
-        color: $color-text-primary;
-        transform: translateY(-2px);
-        outline: none; // Remove default outline
+        box-shadow: 0 0 0 0.25rem rgba($color-accent, 0.5);
+        color: #333333;
+        outline: 2px solid $color-accent;
+        outline-offset: 2px;
 
         &::placeholder {
-          color: lighten(
-            $color-text-secondary,
-            25%
-          ); // Even lighter placeholder when focused
-          opacity: 0.8;
+          color: #888888;
+          opacity: 0.7;
         }
       }
 
       &:hover {
         border-color: lighten($color-border, 25%);
-        background-color: lighten(
-          $color-bg-surface,
-          12%
-        ); // Slightly lighter on hover
+        background-color: lighten($color-bg-surface, 12%);
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        transform: translateY(-1px);
       }
     }
   }
 
-  // Create a visual break in the line where search box sits
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: 400px; // Slightly wider than search box
-    height: 2px;
-    background-color: $color-bg-surface;
-    z-index: 1;
-  }
-
-  // Tabs centered in the container
   .nav-tabs {
     border-bottom: none;
     margin-bottom: 0;
@@ -455,8 +347,24 @@ h6 {
 }
 
 // =============================================================================
-// 7. CARDS & CONTENT
+// CARDS & VIDEO CONTENT
 // =============================================================================
+
+// Empty state styling for tabs with no content
+.empty-state {
+  @include flex-center;
+  min-height: 300px;
+  flex-direction: column;
+  color: $color-text-secondary;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 2rem;
+
+  p {
+    margin: 0;
+    font-style: italic;
+  }
+}
 
 .card {
   @include card-hover-effect;
@@ -467,9 +375,9 @@ h6 {
   flex-direction: column;
   height: 100%;
   background-color: $color-bg-surface;
-  cursor: pointer; // Add cursor pointer for interactive cards
+  cursor: pointer;
 
-  // Enhanced hover effect for video cards
+  // Enhanced hover for video cards
   &.video-card {
     transition: transform $transition-base, box-shadow $transition-base;
 
@@ -477,15 +385,20 @@ h6 {
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 
-      // Start video preview on hover
       iframe {
-        // Add a subtle glow effect to indicate video is active
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
       }
     }
+
+    // Highlight effect for dropdown selection
+    &.highlighted {
+      animation: highlightPulse 3s ease-in-out;
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 0 30px rgba($color-accent, 0.6);
+      border: 2px solid $color-accent;
+    }
   }
 
-  // Image wrapper for rotated placeholder images
   &-img-wrapper {
     height: $card-image-height;
     width: 100%;
@@ -505,7 +418,7 @@ h6 {
     }
   }
 
-  // YouTube video iframes
+  // YouTube iframes - optimized for performance
   iframe {
     width: 100%;
     height: $card-image-height;
@@ -516,7 +429,6 @@ h6 {
     transition: box-shadow $transition-base;
   }
 
-  // Card content
   &-body {
     padding: $card-padding;
     flex-grow: 1;
@@ -539,8 +451,62 @@ h6 {
   }
 }
 
+// Video placeholder for lazy loading
+.video-placeholder {
+  @include flex-center;
+  height: $card-image-height;
+  background: linear-gradient(135deg, $color-bg-main, $color-bg-surface);
+  flex-direction: column;
+  gap: 1rem;
+
+  .placeholder-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid $color-border;
+    object-fit: cover;
+    transform: rotate(90deg);
+  }
+
+  .loading-indicator {
+    color: $color-text-secondary;
+    font-size: $font-size-small;
+    animation: pulse 2s infinite;
+  }
+
+  // Carousel specific styling
+  .carousel-item & {
+    height: 100%;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 30px rgba($color-accent, 0.6);
+    border-color: $color-accent;
+  }
+  50% {
+    box-shadow: 0 0 40px rgba($color-accent, 0.8);
+    border-color: lighten($color-accent, 20%);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba($color-accent, 0.6);
+    border-color: $color-accent;
+  }
+}
+
 // =============================================================================
-// 8. VIDEO OVERLAY SYSTEM
+// VIDEO OVERLAY SYSTEM - Performance optimized
 // =============================================================================
 
 .video-overlay {
@@ -588,7 +554,7 @@ h6 {
     flex: 1;
     width: 100%;
     position: relative;
-    min-height: 0; // Important for flex item to shrink properly
+    min-height: 0;
 
     iframe {
       position: absolute;
@@ -686,45 +652,47 @@ h6 {
 }
 
 // =============================================================================
-// 9. RESPONSIVE DESIGN
+// RESPONSIVE DESIGN - Mobile-first approach
 // =============================================================================
 
-// Medium screens - Fix overlap when grid goes to 2 columns
+// Fix overlap when Bootstrap grid switches to 2 columns (991px breakpoint)
 @media (max-width: 991px) {
-  // This is when Bootstrap's row-cols-lg-3 switches to row-cols-md-2
   .search-tabs-container {
     flex-direction: column;
     align-items: center;
-
-    // Hide the line break effect
-    &::before {
-      display: none;
-    }
 
     .search-form {
       position: static;
       margin-bottom: 1.5rem;
       min-width: 100%;
       max-width: 600px;
+      transform: none;
 
       .form-control {
         border-radius: 20px;
         padding: 0.65rem 1.2rem;
 
-        // Better native focus styling
         &:focus {
           background-color: rgba(255, 255, 255, 0.98);
           border-color: $color-accent;
           box-shadow: 0 0 0 0.25rem rgba($color-accent, 0.5);
-          color: #222222;
+          color: #000000;
+          caret-color: #000000;
           outline: 2px solid $color-accent;
           outline-offset: 2px;
-          transform: translateY(-2px);
+          transform: none;
 
           &::placeholder {
             color: #555555;
             opacity: 0.8;
           }
+        }
+
+        &:hover {
+          border-color: lighten($color-border, 25%);
+          background-color: lighten($color-bg-surface, 12%);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+          transform: none;
         }
       }
     }
@@ -736,7 +704,7 @@ h6 {
   }
 }
 
-// Tablet Styles
+// Tablet optimizations
 @media (max-width: $breakpoint-tablet) {
   .logo-intro-section .main-logo {
     width: 45vw;
@@ -744,45 +712,9 @@ h6 {
   }
 
   .card-img-wrapper,
-  .card iframe {
+  .card iframe,
+  .video-placeholder {
     height: $card-image-height-tablet;
-  }
-
-  // Fix search and tabs overlap on tablet
-  .search-tabs-container {
-    flex-direction: column;
-    align-items: center;
-
-    // Hide the line break effect on tablet
-    &::before {
-      display: none;
-    }
-
-    .search-form {
-      position: static;
-      margin-bottom: 1.5rem;
-      min-width: 100%;
-      max-width: 500px; // Limit width on tablet
-
-      .form-control {
-        border-radius: 20px;
-        padding: 0.65rem 1.2rem;
-
-        &:focus {
-          background-color: rgba(255, 255, 255, 0.95);
-          box-shadow: 0 0 0 0.3rem rgba($color-accent, 0.6),
-            0 6px 20px rgba($color-accent, 0.3),
-            inset 0 0 0 2px rgba($color-accent, 0.2);
-          color: #333333;
-          transform: translateY(-3px) scale(1.02);
-        }
-      }
-    }
-
-    .nav-tabs {
-      width: 100%;
-      justify-content: center;
-    }
   }
 
   .video-overlay {
@@ -810,7 +742,7 @@ h6 {
   }
 }
 
-// Mobile Styles
+// Mobile optimizations
 @media (max-width: $breakpoint-mobile) {
   .logo-intro-section .main-logo {
     width: 60vw;
@@ -818,7 +750,8 @@ h6 {
   }
 
   .card-img-wrapper,
-  .card iframe {
+  .card iframe,
+  .video-placeholder {
     height: $card-image-height-mobile;
   }
 
@@ -827,49 +760,12 @@ h6 {
     font-size: $font-size-small;
   }
 
-  // Responsive search and tabs container
-  .search-tabs-container {
-    flex-direction: column;
-    align-items: center;
-
-    // Hide the line break effect on mobile
-    &::before {
-      display: none;
-    }
-
-    .search-form {
-      position: static;
-      margin-bottom: 1.5rem;
-      min-width: 100%;
-      max-width: 100%;
-
-      .form-control {
-        border-radius: 20px; // Slightly less rounded on mobile
-        padding: 0.7rem 1.2rem;
-        font-size: 1rem;
-
-        &:focus {
-          background-color: lighten($color-bg-surface, 15%);
-          box-shadow: 0 0 0 0.2rem rgba($color-accent, 0.4),
-            0 4px 12px rgba(0, 0, 0, 0.2),
-            inset 0 0 0 1px rgba($color-accent, 0.3);
-        }
-      }
-    }
-
-    .nav-tabs {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  // Force single column on mobile for all grids using proper specificity
+  // Force single column layout
   .container .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
     flex: 0 0 100%;
     max-width: 100%;
   }
 
-  // Carousel responsive adjustments
   .carousel-section .carousel {
     &-inner {
       height: 400px;
@@ -887,7 +783,6 @@ h6 {
     }
   }
 
-  // Video overlay mobile adjustments
   .video-overlay {
     &-content {
       width: 98vw;
@@ -917,12 +812,6 @@ h6 {
     }
   }
 
-  // Responsive adjustments for offcanvas dropdown menus
-  .offcanvas-body .dropdown-menu {
-    max-height: 50vh; // Smaller on mobile to account for virtual keyboard
-  }
-
-  // Navbar toggler adjustments for mobile
   .navbar-toggler {
     width: 38px;
     height: 34px;
@@ -930,7 +819,7 @@ h6 {
   }
 }
 
-// Extra small mobile devices (ensure single column) - using proper specificity
+// Ensure single column on all mobile devices
 @media (max-width: 767px) {
   .main-section .container .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
     flex: 0 0 100%;
@@ -939,7 +828,7 @@ h6 {
 }
 
 // =============================================================================
-// 10. OFFCANVAS SIDEBAR STYLING
+// OFFCANVAS SIDEBAR
 // =============================================================================
 
 .offcanvas {
@@ -1003,7 +892,7 @@ h6 {
       }
     }
 
-    // Dropdown menus styling
+    // Dropdown styling with performance considerations
     .dropdown-menu {
       background-color: $color-bg-surface;
       border: 1px solid $color-border;
@@ -1032,7 +921,7 @@ h6 {
         }
       }
 
-      // Custom scrollbar for dropdown
+      // Custom scrollbar
       &::-webkit-scrollbar {
         width: 6px;
       }

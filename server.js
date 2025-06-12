@@ -1,17 +1,11 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import compression from "compression";
-import helmet from "helmet";
+const express = require("express");
+const path = require("path");
+const compression = require("compression");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Environment configuration
-const PORT = process.env.PORT || 3001;
-const NODE_ENV = process.env.NODE_ENV || "development";
-const isProduction = NODE_ENV === "production";
+const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(
@@ -19,101 +13,92 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-        scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
         imgSrc: ["'self'", "data:", "https:"],
-        frameSrc: ["https://www.youtube.com"],
+        fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+        frameSrc: ["'self'", "https://www.youtube.com"],
         connectSrc: ["'self'"],
       },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
+
+// Compression middleware
+app.use(
+  compression({
+    level: 6,
+    threshold: 1024,
+    filter: (req, res) => {
+      if (req.headers["x-no-compression"]) {
+        return false;
+      }
+      return compression.filter(req, res);
     },
   })
 );
 
-// Compression middleware for better performance
-app.use(compression());
+// Static file serving
+app.use(
+  express.static(path.join(__dirname), {
+    maxAge: "1d",
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".json")) {
+        res.setHeader("Cache-Control", "public, max-age=3600");
+      } else if (filePath.match(/\.(css|js)$/)) {
+        res.setHeader("Cache-Control", "public, max-age=86400");
+      } else if (filePath.match(/\.(jpg|jpeg|png|gif|ico|svg)$/)) {
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      }
+    },
+  })
+);
 
-// Static file serving with proper caching
-const staticOptions = {
-  maxAge: isProduction ? "1y" : "0",
-  etag: true,
-  lastModified: true,
-};
-
-app.use(express.static(__dirname, staticOptions));
-app.use(express.static(path.join(__dirname, "public"), staticOptions));
-
-// API endpoints for JSON data with proper headers
-app.get("/json/:file", (req, res) => {
-  const filename = req.params.file;
-
-  // Security: only allow specific JSON files
-  const allowedFiles = ["videos.json", "todo.json"];
-  if (!allowedFiles.includes(filename)) {
-    return res.status(404).json({ error: "File not found" });
-  }
-
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader(
-    "Cache-Control",
-    isProduction ? "public, max-age=3600" : "no-cache"
-  );
-
-  const filePath = path.join(__dirname, "json", filename);
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error("Error serving JSON file:", err);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-});
-
-// Main route
+// Routes
 app.get("/", (req, res) => {
-  res.setHeader(
-    "Cache-Control",
-    isProduction ? "public, max-age=3600" : "no-cache"
-  );
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    environment: NODE_ENV,
-  });
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// 404 handler
+// Error handling
 app.use((req, res) => {
-  res.status(404).json({ error: "Page not found" });
+  res.status(404).sendFile(path.join(__dirname, "index.html"));
 });
 
-// Error handler
 app.use((err, req, res, next) => {
-  console.error("Server error:", err);
-  res.status(500).json({
-    error: isProduction ? "Internal server error" : err.message,
-  });
+  console.error("Server error:", err.stack);
+  res.status(500).json({ error: "Internal server error" });
+});
+
+// Server startup
+app.listen(PORT, () => {
+  console.log(`SkateList server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
+  console.log("SIGTERM received, shutting down gracefully");
   process.exit(0);
 });
 
 process.on("SIGINT", () => {
-  console.log("SIGINT received. Shutting down gracefully...");
+  console.log("SIGINT received, shutting down gracefully");
   process.exit(0);
 });
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 SkateList application started and listening on port ${PORT}`);
-  console.log(`📦 Environment: ${NODE_ENV}`);
-  console.log(`🌍 Access at: http://localhost:${PORT}`);
-});
-
-export default app;
