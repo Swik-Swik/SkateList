@@ -1,15 +1,42 @@
 {
+  "name": "skatelist",
+  "version": "1.0.0",
+  "description": "High-performance skateboard tricks video showcase",
   "type": "module",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "scss": "sass scss/main.scss public/css/style.css --watch",
-    "build": "sass scss/main.scss public/css/style.css"
+    "dev": "concurrently \"npm run sass:watch\" \"npm run server:dev\"",
+    "start": "NODE_ENV=production node server.js",
+    "server:dev": "nodemon server.js",
+    "sass:build": "sass scss/main.scss:public/css/style.css --style=compressed --no-source-map",
+    "sass:watch": "sass scss/main.scss:public/css/style.css --watch --style=expanded",
+    "build": "npm run sass:build && npm run js:minify",
+    "js:minify": "terser js/script.js -o public/js/script.min.js --compress --mangle",
+    "prestart": "npm run build",
+    "health": "curl -f http://localhost:3001/health || exit 1"
   },
+  "keywords": [
+    "skateboard",
+    "tricks",
+    "videos",
+    "showcase",
+    "performance"
+  ],
+  "author": "SkateList Team",
+  "license": "MIT",
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.18.2",
-    "yarn": "^1.22.22"
+    "helmet": "^7.1.0"
   },
   "devDependencies": {
-    "sass": "^1.89.2"
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "sass": "^1.69.5",
+    "terser": "^5.24.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

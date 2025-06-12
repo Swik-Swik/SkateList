@@ -1,581 +1,823 @@
-// Global variables
-let allVideos = [];
-let todoTricks = [];
-let carouselVideos = []; // Store carousel videos for title reference
-let currentOverlayVideo = null; // Track currently overlayed video
+/**
+ * SkateList - High-Performance Video Showcase Application
+ * Optimized for fast loading and smooth user experience
+ */
 
-// Fetch the JSON data
-Promise.all([
-  fetch("json/videos.json").then((response) => response.json()),
-  fetch("json/todo.json").then((response) => response.json()),
-])
-  .then(([videos, todos]) => {
-    allVideos = videos;
-    todoTricks = todos;
+const SkateApp = (function () {
+  "use strict";
 
-    // Initialize the page
-    initializePage();
-  })
-  .catch((error) => {
-    console.error("Error loading data:", error);
-  });
+  // Configuration
+  const CONFIG = {
+    API_ENDPOINTS: {
+      VIDEOS: "json/videos.json",
+      TODO: "json/todo.json",
+    },
+    YOUTUBE_BASE_URL: "https://www.youtube.com/embed/",
+    CAROUSEL_FEATURED_COUNT: 5,
+    VIDEO_PREVIEW_DELAY: 2000,
+    VIDEO_PREVIEW_STOP_DELAY: 100,
+    OVERLAY_ANIMATION_DURATION: 300,
+    DEFAULT_IMAGES: {
+      NORMAL: "./images/normal.jpg",
+      NOLLIE: "./images/nollie.jpg",
+      FAKIE: "./images/fakie.jpg",
+      SWITCH: "./images/switch.jpg",
+      UNKNOWN: "./images/unknown.jpg",
+    },
+  };
 
-function initializePage() {
-  // Populate carousel with featured videos (videos with paths)
-  populateCarousel();
+  // Application state
+  let state = {
+    allVideos: [],
+    todoTricks: [],
+    carouselVideos: [],
+    currentOverlayVideo: null,
+    isLoading: false,
+  };
 
-  // Populate tabs with categorized videos
-  populateTabs();
+  // Cached DOM elements
+  const elements = {};
 
-  // Update navigation dropdowns
-  updateNavigationDropdowns();
+  // Performance observers
+  let previewTimeouts = new Map();
 
-  // Setup search functionality
-  setupSearch();
-
-  // Setup carousel video controls
-  setupCarouselVideoControls();
-
-  // Setup video overlay functionality
-  setupVideoOverlay();
-}
-
-function populateCarousel() {
-  const carouselContent = document.getElementById("carousel-content");
-
-  // Get videos that have paths (featured videos)
-  const featuredVideos = allVideos.filter(
-    (video) => video.path && video.path !== ""
-  );
-
-  // Take first 5 featured videos for carousel
-  carouselVideos = featuredVideos.slice(0, 5); // Store for title reference
-
-  if (carouselVideos.length === 0) {
-    carouselContent.innerHTML =
-      '<div class="carousel-item active"><div class="d-flex align-items-center justify-content-center h-100"><h3 class="text-light">No featured videos available</h3></div></div>';
-    return;
+  /**
+   * Initialize application
+   */
+  async function init() {
+    try {
+      state.isLoading = true;
+      cacheElements();
+      await loadData();
+      setupEventListeners();
+      renderAll();
+      preloadCriticalResources();
+    } catch (error) {
+      handleError("Failed to initialize application", error);
+    } finally {
+      state.isLoading = false;
+    }
   }
 
-  carouselVideos.forEach((video, index) => {
-    const carouselItem = document.createElement("div");
-    carouselItem.className = `carousel-item ${index === 0 ? "active" : ""}`;
-    carouselItem.setAttribute("data-video-title", video.title); // Store title in data attribute
+  /**
+   * Cache DOM elements for performance
+   */
+  function cacheElements() {
+    const elementIds = [
+      "carousel-content",
+      "carousel-title",
+      "search-bar",
+      "flatTricksGrid",
+      "grindsGrid",
+      "otherGrid",
+      "dropdown-done",
+      "dropdown-todo",
+      "trickDoneTitle",
+      "trickTodoTitle",
+      "highlightedCarousel",
+    ];
 
-    const videoElement = createVideoElement(video);
-    carouselItem.appendChild(videoElement);
-
-    carouselContent.appendChild(carouselItem);
-  });
-
-  // Set initial title
-  updateCarouselTitle(0);
-}
-
-function populateTabs() {
-  // Categorize videos
-  const flatTricks = allVideos.filter(
-    (video) =>
-      video.types.includes("FLIPTRICK") ||
-      video.types.includes("ROTATION") ||
-      video.types.includes("PIVOT") ||
-      (video.types.length === 1 &&
-        ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(video.types[0]))
-  );
-
-  // For now, grinds will be empty since no grind tricks exist in the data
-  const grinds = allVideos.filter((video) =>
-    video.types.some((type) => type.toLowerCase().includes("grind"))
-  );
-
-  // Other tricks (remaining tricks not in flat tricks or grinds)
-  const otherTricks = allVideos.filter(
-    (video) => !flatTricks.includes(video) && !grinds.includes(video)
-  );
-
-  // Populate each tab
-  populateGrid("flatTricksGrid", flatTricks);
-  populateGrid("grindsGrid", grinds);
-  populateGrid("otherGrid", otherTricks);
-}
-
-function populateGrid(gridId, videos) {
-  const grid = document.getElementById(gridId);
-
-  if (videos.length === 0) {
-    grid.innerHTML =
-      '<div class="col-12"><div class="text-center py-5"><h4 class="text-light">No tricks in this category yet</h4></div></div>';
-    return;
+    elementIds.forEach((id) => {
+      elements[id.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] =
+        document.getElementById(id);
+    });
   }
 
-  grid.innerHTML = "";
+  /**
+   * Load data with enhanced error handling
+   */
+  async function loadData() {
+    try {
+      const [videosResponse, todosResponse] = await Promise.all([
+        fetch(CONFIG.API_ENDPOINTS.VIDEOS),
+        fetch(CONFIG.API_ENDPOINTS.TODO),
+      ]);
 
-  // Sort videos: ones with a path (video preview) come first
-  videos.sort((a, b) => {
-    if (a.path && !b.path) return -1;
-    if (!a.path && b.path) return 1;
-    return 0;
-  });
+      if (!videosResponse.ok || !todosResponse.ok) {
+        throw new Error("Failed to fetch data from server");
+      }
 
-  videos.forEach((video) => {
-    const colDiv = document.createElement("div");
-    colDiv.className = "col";
-    colDiv.id = video.title;
+      const [videos, todos] = await Promise.all([
+        videosResponse.json(),
+        todosResponse.json(),
+      ]);
 
-    const cardDiv = document.createElement("div");
-    // Add video-card class for enhanced styling and mark as clickable
-    cardDiv.className = video.path ? "card h-100 video-card" : "card h-100";
-    cardDiv.setAttribute("data-video-title", video.title);
-    cardDiv.setAttribute("data-video-path", video.path || "");
-    cardDiv.setAttribute("data-video-types", video.types.join(", "));
+      if (!Array.isArray(videos) || !Array.isArray(todos)) {
+        throw new Error("Invalid data format received");
+      }
 
-    // Make entire card clickable for video overlay (both video and non-video cards)
-    cardDiv.addEventListener("click", (e) => {
-      // Prevent event from triggering multiple times
-      e.stopPropagation();
-      openVideoOverlay(video);
+      state.allVideos = videos;
+      state.todoTricks = todos;
+    } catch (error) {
+      throw new Error(`Data loading failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Setup optimized event listeners
+   */
+  function setupEventListeners() {
+    if (elements.searchBar) {
+      elements.searchBar.addEventListener("keyup", debounce(handleSearch, 250));
+    }
+
+    setupCarouselControls();
+    setupVideoOverlay();
+
+    // Cleanup on page unload
+    window.addEventListener("beforeunload", cleanup);
+
+    // Handle visibility changes to pause videos when tab is hidden
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+  }
+
+  /**
+   * Handle tab visibility changes for performance
+   */
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      pauseAllVideos();
+    }
+  }
+
+  /**
+   * Render all components with performance optimizations
+   */
+  function renderAll() {
+    renderCarousel();
+    renderTabs();
+    renderNavigationDropdowns();
+  }
+
+  /**
+   * Render carousel
+   */
+  function renderCarousel() {
+    if (!elements.carouselContent) return;
+
+    const featuredVideos = state.allVideos
+      .filter((video) => video.path && video.path.trim() !== "")
+      .slice(0, CONFIG.CAROUSEL_FEATURED_COUNT);
+
+    state.carouselVideos = featuredVideos;
+
+    if (featuredVideos.length === 0) {
+      elements.carouselContent.innerHTML = createEmptyStateHTML(
+        "No featured videos available"
+      );
+      return;
+    }
+
+    const carouselHTML = featuredVideos
+      .map((video, index) => createCarouselItemHTML(video, index === 0))
+      .join("");
+
+    elements.carouselContent.innerHTML = carouselHTML;
+    updateCarouselTitle(0);
+  }
+
+  /**
+   * Create carousel item HTML
+   */
+  function createCarouselItemHTML(video, isActive) {
+    const activeClass = isActive ? "active" : "";
+
+    return `
+      <div class="carousel-item ${activeClass}" data-video-title="${escapeHtml(
+      video.title
+    )}" data-video-id="${video.path}">
+        ${createCarouselVideoHTML(video)}
+      </div>
+    `;
+  }
+
+  /**
+   * Create video element HTML for carousel
+   */
+  function createCarouselVideoHTML(video) {
+    if (!video.path || video.path.trim() === "") {
+      return createImageHTML(video);
+    }
+
+    return `
+      <iframe
+        src="${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        id="youtube-${video.path}"
+        style="width: 100%; height: 100%;"
+      ></iframe>
+    `;
+  }
+
+  /**
+   * Create static image HTML for videos without paths
+   */
+  function createImageHTML(video) {
+    return `
+      <div class="card-img-wrapper">
+        <img src="${getImageForTrickType(
+          video.types[0]
+        )}" class="card-img-top" alt="${escapeHtml(video.title)}">
+      </div>
+    `;
+  }
+
+  /**
+   * Render tabs
+   */
+  function renderTabs() {
+    const categorizedVideos = categorizeVideos(state.allVideos);
+
+    renderGridOptimized(elements.flatTricksGrid, categorizedVideos.flatTricks);
+    renderGridOptimized(elements.grindsGrid, categorizedVideos.grinds);
+    renderGridOptimized(elements.otherGrid, categorizedVideos.other);
+  }
+
+  /**
+   * Categorize videos
+   */
+  function categorizeVideos(videos) {
+    const categories = { flatTricks: [], grinds: [], other: [] };
+
+    videos.forEach((video) => {
+      const hasFlipTrick = video.types.some(
+        (type) =>
+          ["FLIPTRICK", "ROTATION", "PIVOT"].includes(type) ||
+          (video.types.length === 1 &&
+            ["NORMAL", "NOLLIE", "FAKIE", "SWITCH"].includes(type))
+      );
+
+      if (hasFlipTrick) {
+        categories.flatTricks.push(video);
+      } else if (video.types.includes("GRIND")) {
+        categories.grinds.push(video);
+      } else {
+        categories.other.push(video);
+      }
     });
 
-    // Add hover event listeners for video preview ONLY for cards with videos
-    if (video.path) {
-      setupVideoPreview(cardDiv, video);
+    // Sort each category: videos with paths first, then videos without paths
+    const sortVideos = (videoArray) => {
+      return videoArray.sort((a, b) => {
+        const aHasVideo = a.path && a.path.trim() !== "";
+        const bHasVideo = b.path && b.path.trim() !== "";
+
+        if (aHasVideo && !bHasVideo) return -1;
+        if (!aHasVideo && bHasVideo) return 1;
+        return 0;
+      });
+    };
+
+    categories.flatTricks = sortVideos(categories.flatTricks);
+    categories.grinds = sortVideos(categories.grinds);
+    categories.other = sortVideos(categories.other);
+
+    return categories;
+  }
+
+  /**
+   * Render grid with document fragments
+   */
+  function renderGridOptimized(gridElement, videos) {
+    if (!gridElement) return;
+
+    if (videos.length === 0) {
+      gridElement.innerHTML = createEmptyStateHTML(
+        "No tricks in this category yet"
+      );
+      return;
     }
 
-    // Create video or image element
-    const mediaElement = createVideoElement(video);
-    cardDiv.appendChild(mediaElement);
+    const fragment = document.createDocumentFragment();
 
-    // Create card body
-    const cardBody = document.createElement("div");
-    cardBody.className = "card-body";
+    videos.forEach((video) => {
+      const col = document.createElement("div");
+      col.className = "col";
+      col.innerHTML = createVideoCardHTML(video);
+      fragment.appendChild(col);
+    });
 
-    const title = document.createElement("h5");
-    title.className = "card-title";
-    title.textContent = video.title;
+    gridElement.innerHTML = "";
+    gridElement.appendChild(fragment);
 
-    const types = document.createElement("p");
-    types.className = "card-text";
-    types.textContent = video.types.join(", ");
+    const videoCards = gridElement.querySelectorAll(
+      ".card[data-has-video='true']"
+    );
+    videoCards.forEach((card) => {
+      const videoId = card.dataset.videoId;
+      const video = state.allVideos.find((v) => v.path === videoId);
+      if (video) {
+        setupVideoPreview(card, video);
+      }
+    });
+  }
 
-    cardBody.appendChild(title);
-    cardBody.appendChild(types);
-    cardDiv.appendChild(cardBody);
-    colDiv.appendChild(cardDiv);
-    grid.appendChild(colDiv);
-  });
-}
+  /**
+   * Create video card HTML
+   */
+  function createVideoCardHTML(video) {
+    const hasVideo = video.path && video.path.trim() !== "";
 
-function createVideoElement(video) {
-  if (video.path && video.path !== "") {
-    const videoElem = document.createElement("iframe");
-    // Start with NO autoplay for cards - only static preview
-    videoElem.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=0&loop=0&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
-    videoElem.setAttribute("allowfullscreen", "");
-    videoElem.setAttribute("frameborder", "0");
-    videoElem.setAttribute("id", `youtube-${video.path}`);
-    return videoElem;
-  } else {
-    // Create a wrapper to contain the rotated image and prevent overflow
-    const wrapper = document.createElement("div");
-    wrapper.className = "card-img-wrapper";
+    return `
+      <div class="card video-card h-100" data-video-id="${video.path}" ${
+      hasVideo ? 'data-has-video="true"' : ""
+    }>
+        ${hasVideo ? createVideoIframeHTML(video) : createImageHTML(video)}
+        <div class="card-body">
+          <h5 class="card-title">${escapeHtml(video.title)}</h5>
+          <p class="card-text">${createVideoDescription(video)}</p>
+        </div>
+      </div>
+    `;
+  }
 
-    const trickImage = document.createElement("img");
-    trickImage.className = "card-img-top";
-
-    // Set image based on trick type
-    switch (video.types[0]) {
-      case "NORMAL":
-        trickImage.src = "./images/normal.jpg";
-        break;
-      case "NOLLIE":
-        trickImage.src = "./images/nollie.jpg";
-        break;
-      case "FAKIE":
-        trickImage.src = "./images/fakie.jpg";
-        break;
-      case "SWITCH":
-        trickImage.src = "./images/switch.jpg";
-        break;
-      default:
-        trickImage.src = "./images/unknown.jpg";
+  /**
+   * Create video iframe HTML directly
+   */
+  function createVideoIframeHTML(video) {
+    if (!video.path || video.path.trim() === "") {
+      return createImageHTML(video);
     }
 
-    trickImage.alt = video.title;
-
-    wrapper.appendChild(trickImage);
-    return wrapper;
-  }
-}
-
-function updateNavigationDropdowns() {
-  // Update tricks done dropdown
-  const dropdownDone = document.getElementById("dropdown-done");
-  const trickDoneTitle = document.getElementById("trickDoneTitle");
-
-  dropdownDone.innerHTML = "";
-
-  allVideos.forEach((video) => {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.className = "dropdown-item";
-    a.href = `#${video.title}`;
-    a.textContent = video.title;
-    li.appendChild(a);
-    dropdownDone.appendChild(li);
-  });
-
-  if (trickDoneTitle) {
-    trickDoneTitle.textContent = `Tricks Done (${allVideos.length})`;
+    return `
+      <iframe
+        src="${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        id="youtube-${video.path}"
+        style="width: 100%; height: 250px;"
+      ></iframe>
+    `;
   }
 
-  // Update tricks todo dropdown
-  const dropdownTodo = document.getElementById("dropdown-todo");
-  const trickTodoTitle = document.getElementById("trickTodoTitle");
-
-  dropdownTodo.innerHTML = "";
-
-  todoTricks.forEach((trick) => {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.className = "dropdown-item";
-    a.href = "#";
-    a.textContent = trick.name;
-    li.appendChild(a);
-    dropdownTodo.appendChild(li);
-  });
-
-  if (trickTodoTitle) {
-    trickTodoTitle.textContent = `Tricks Todo (${todoTricks.length})`;
+  /**
+   * Create video description
+   */
+  function createVideoDescription(video) {
+    const types = video.types.join(", ");
+    const dateInfo = video.dateAndPlace?.[0];
+    return dateInfo ? `${types} - ${dateInfo.date}` : types;
   }
-}
 
-function setupSearch() {
-  const searchBar = document.getElementById("search-bar");
+  /**
+   * Get image for trick type
+   */
+  function getImageForTrickType(type) {
+    return CONFIG.DEFAULT_IMAGES[type] || CONFIG.DEFAULT_IMAGES.UNKNOWN;
+  }
 
-  searchBar.addEventListener("keyup", (event) => {
-    const query = event.target.value.toLowerCase();
+  /**
+   * Setup video preview
+   */
+  function setupVideoPreview(cardElement, video) {
+    const iframe = cardElement.querySelector("iframe");
+    if (!iframe || !video.path) return;
 
-    // Search in all tab grids
-    const grids = ["flatTricksGrid", "grindsGrid", "otherGrid"];
+    let previewTimeout;
 
-    grids.forEach((gridId) => {
-      const grid = document.getElementById(gridId);
-      const videoContainers = Array.from(grid.children);
+    const handleMouseEnter = () => {
+      if (previewTimeout) {
+        clearTimeout(previewTimeout);
+      }
 
-      videoContainers.forEach((container) => {
-        const titleElement = container.querySelector(".card-title");
-        const typesElement = container.querySelector(".card-text");
+      previewTimeout = setTimeout(() => {
+        startVideoPreview(iframe, video);
+      }, CONFIG.VIDEO_PREVIEW_DELAY);
 
-        if (titleElement && typesElement) {
-          const title = titleElement.textContent.toLowerCase();
-          const types = typesElement.textContent.toLowerCase();
-          const isMatch = title.includes(query) || types.includes(query);
+      previewTimeouts.set(cardElement, previewTimeout);
+    };
 
-          container.style.display = isMatch ? "block" : "none";
+    const handleMouseLeave = () => {
+      if (previewTimeout) {
+        clearTimeout(previewTimeout);
+        previewTimeouts.delete(cardElement);
+      }
+
+      setTimeout(() => {
+        stopVideoPreview(iframe, video);
+      }, CONFIG.VIDEO_PREVIEW_STOP_DELAY);
+    };
+
+    cardElement.addEventListener("mouseenter", handleMouseEnter);
+    cardElement.addEventListener("mouseleave", handleMouseLeave);
+    cardElement.addEventListener("click", () => openVideoOverlay(video));
+  }
+
+  /**
+   * Start video preview
+   */
+  function startVideoPreview(iframe, video) {
+    if (!iframe?.contentWindow || !video.path) return;
+
+    try {
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&mute=1&rel=0&modestbranding=1`;
+    } catch (error) {
+      console.warn("Failed to start video preview:", error);
+    }
+  }
+
+  /**
+   * Stop video preview
+   */
+  function stopVideoPreview(iframe, video) {
+    if (!iframe?.contentWindow || !video.path) return;
+
+    try {
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&rel=0&modestbranding=1`;
+    } catch (error) {
+      console.warn("Failed to stop video preview:", error);
+    }
+  }
+
+  /**
+   * Render navigation dropdowns
+   */
+  function renderNavigationDropdowns() {
+    const videosWithPath = [];
+    const videosWithoutPath = [];
+
+    state.allVideos.forEach((video) => {
+      if (video.path && video.path.trim() !== "") {
+        videosWithPath.push(video);
+      } else {
+        videosWithoutPath.push(video);
+      }
+    });
+
+    renderDropdown(elements.dropdownDone, videosWithPath);
+    renderDropdown(elements.dropdownTodo, videosWithoutPath);
+
+    if (elements.trickDoneTitle) {
+      elements.trickDoneTitle.textContent = `Tricks Done (${videosWithPath.length})`;
+    }
+    if (elements.trickTodoTitle) {
+      elements.trickTodoTitle.textContent = `Tricks Todo (${videosWithoutPath.length})`;
+    }
+  }
+
+  /**
+   * Render dropdown with document fragment
+   */
+  function renderDropdown(dropdownElement, videos) {
+    if (!dropdownElement) return;
+
+    const fragment = document.createDocumentFragment();
+
+    videos.forEach((video) => {
+      const li = document.createElement("li");
+      const button = document.createElement("button");
+      button.className = "dropdown-item";
+      button.textContent = video.title;
+      button.addEventListener("click", () => {
+        openVideoOverlay(video);
+        scrollToVideoCard(video);
+        closeSidebar();
+      });
+      li.appendChild(button);
+      fragment.appendChild(li);
+    });
+
+    dropdownElement.innerHTML = "";
+    dropdownElement.appendChild(fragment);
+  }
+
+  /**
+   * Scroll to and highlight video card
+   */
+  function scrollToVideoCard(video) {
+    const videoCard = document.querySelector(`[data-video-id="${video.path}"]`);
+    if (!videoCard) return;
+
+    const tabContent = videoCard.closest(".tab-pane");
+    if (!tabContent) return;
+
+    const tabId = tabContent.id;
+    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+    if (tabButton && !tabButton.classList.contains("active")) {
+      const tab = new bootstrap.Tab(tabButton);
+      tab.show();
+    }
+
+    setTimeout(() => {
+      videoCard.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+
+      videoCard.classList.add("highlighted");
+      setTimeout(() => {
+        videoCard.classList.remove("highlighted");
+      }, 3000);
+    }, 150);
+  }
+
+  /**
+   * Close sidebar menu
+   */
+  function closeSidebar() {
+    const offcanvasElement = document.getElementById("offcanvasDarkNavbar");
+    if (offcanvasElement) {
+      const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+      if (offcanvas) {
+        offcanvas.hide();
+      }
+    }
+  }
+
+  /**
+   * Search handler
+   */
+  function handleSearch(event) {
+    const query = event.target.value.toLowerCase().trim();
+
+    if (query === "") {
+      renderTabs();
+      return;
+    }
+
+    const filteredVideos = state.allVideos.filter(
+      (video) =>
+        video.title.toLowerCase().includes(query) ||
+        video.types.some((type) => type.toLowerCase().includes(query))
+    );
+
+    const categorizedVideos = categorizeVideos(filteredVideos);
+    renderGridOptimized(elements.flatTricksGrid, categorizedVideos.flatTricks);
+    renderGridOptimized(elements.grindsGrid, categorizedVideos.grinds);
+    renderGridOptimized(elements.otherGrid, categorizedVideos.other);
+  }
+
+  /**
+   * Setup carousel controls
+   */
+  function setupCarouselControls() {
+    if (!elements.highlightedCarousel) return;
+
+    const stopAllVideos = () => {
+      const iframes = elements.highlightedCarousel.querySelectorAll(
+        'iframe[id^="youtube-"]'
+      );
+      iframes.forEach((iframe) => {
+        try {
+          iframe.contentWindow?.postMessage(
+            '{"event":"command","func":"stopVideo","args":""}',
+            "*"
+          );
+        } catch (error) {
+          console.warn("Failed to stop video:", error);
         }
       });
+    };
+
+    elements.highlightedCarousel.addEventListener(
+      "slide.bs.carousel",
+      (event) => {
+        pauseAllVideos();
+        updateCarouselTitle(event.to);
+      }
+    );
+
+    elements.highlightedCarousel.addEventListener(
+      "slid.bs.carousel",
+      stopAllVideos
+    );
+  }
+
+  /**
+   * Update carousel title
+   */
+  function updateCarouselTitle(activeIndex) {
+    if (!elements.carouselTitle || !state.carouselVideos[activeIndex]) return;
+
+    const newTitle = state.carouselVideos[activeIndex].title;
+
+    elements.carouselTitle.style.opacity = "0";
+    elements.carouselTitle.style.transform = "translateY(-10px)";
+
+    setTimeout(() => {
+      elements.carouselTitle.textContent = newTitle;
+      elements.carouselTitle.style.opacity = "1";
+      elements.carouselTitle.style.transform = "translateY(0)";
+    }, 150);
+  }
+
+  /**
+   * Setup video overlay
+   */
+  function setupVideoOverlay() {
+    const overlay = document.createElement("div");
+    overlay.className = "video-overlay";
+    overlay.innerHTML = `
+      <div class="video-overlay-content">
+        <button class="video-overlay-close" aria-label="Close video">&times;</button>
+        <div class="video-overlay-video-container"></div>
+        <div class="video-overlay-info">
+          <h3></h3>
+          <p></p>
+      </div>
+    </div>
+  `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeVideoOverlay();
     });
-  });
-}
 
-function setupCarouselVideoControls() {
-  const carousel = document.getElementById("highlightedCarousel");
+    overlay
+      .querySelector(".video-overlay-close")
+      .addEventListener("click", closeVideoOverlay);
 
-  if (!carousel) return;
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.classList.contains("active")) {
+        closeVideoOverlay();
+      }
+    });
+  }
 
-  // Function to pause all YouTube videos in the carousel
-  function pauseAllCarouselVideos() {
-    const iframes = carousel.querySelectorAll("iframe[id^='youtube-']");
+  /**
+   * Open video overlay
+   */
+  function openVideoOverlay(video) {
+    const overlay = document.querySelector(".video-overlay");
+    const container = overlay.querySelector(".video-overlay-video-container");
+    const info = overlay.querySelector(".video-overlay-info");
+
+    state.currentOverlayVideo = video;
+
+    info.querySelector("h3").textContent = video.title;
+    info.querySelector("p").textContent = createVideoDescription(video);
+
+    container.innerHTML = "";
+
+    if (video.path && video.path.trim() !== "") {
+      const iframe = document.createElement("iframe");
+      iframe.src = `${CONFIG.YOUTUBE_BASE_URL}${video.path}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`;
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("allow", "autoplay; encrypted-media");
+      iframe.setAttribute("id", `overlay-youtube-${video.path}`);
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+
+      container.appendChild(iframe);
+    } else {
+      container.innerHTML = createPlaceholderHTML(video);
+    }
+
+    overlay.classList.add("active");
+    document.body.classList.add("video-overlay-active");
+  }
+
+  /**
+   * Create placeholder HTML for overlay
+   */
+  function createPlaceholderHTML(video) {
+    return `
+      <div class="video-placeholder">
+        <img src="${getImageForTrickType(video.types[0])}" alt="${escapeHtml(
+      video.title
+    )}" class="placeholder-image">
+        <div class="placeholder-text">
+          <h3>${escapeHtml(video.title)}</h3>
+          <p>Video coming soon!</p>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Close video overlay
+   */
+  function closeVideoOverlay() {
+    const overlay = document.querySelector(".video-overlay");
+    if (!overlay) return;
+
+    if (state.currentOverlayVideo?.path) {
+      const iframe = document.getElementById(
+        `overlay-youtube-${state.currentOverlayVideo.path}`
+      );
+      if (iframe?.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage(
+            '{"event":"command","func":"stopVideo","args":""}',
+            "*"
+          );
+        } catch (error) {
+          console.warn("Failed to stop overlay video:", error);
+        }
+      }
+    }
+
+    overlay.classList.remove("active");
+    document.body.classList.remove("video-overlay-active");
+    state.currentOverlayVideo = null;
+
+    setTimeout(() => {
+      const container = overlay.querySelector(".video-overlay-video-container");
+      if (container) container.innerHTML = "";
+    }, CONFIG.OVERLAY_ANIMATION_DURATION);
+  }
+
+  /**
+   * Pause all videos
+   */
+  function pauseAllVideos() {
+    const iframes = document.querySelectorAll('iframe[id^="youtube-"]');
     iframes.forEach((iframe) => {
       try {
-        // Send pause command to YouTube iframe
-        iframe.contentWindow.postMessage(
+        iframe.contentWindow?.postMessage(
           '{"event":"command","func":"pauseVideo","args":""}',
           "*"
         );
       } catch (error) {
-        console.log("Could not pause video:", error);
+        console.warn("Failed to pause video:", error);
       }
     });
   }
 
-  // Function to stop all YouTube videos in the carousel (more aggressive than pause)
-  function stopAllCarouselVideos() {
-    const iframes = carousel.querySelectorAll("iframe[id^='youtube-']");
-    iframes.forEach((iframe) => {
-      try {
-        // Send stop command to YouTube iframe
-        iframe.contentWindow.postMessage(
-          '{"event":"command","func":"stopVideo","args":""}',
-          "*"
-        );
-      } catch (error) {
-        console.log("Could not stop video:", error);
-      }
+  /**
+   * Preload critical resources
+   */
+  function preloadCriticalResources() {
+    Object.values(CONFIG.DEFAULT_IMAGES).forEach((src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
     });
   }
 
-  // Listen for carousel slide events
-  carousel.addEventListener("slide.bs.carousel", function (event) {
-    // This event fires when the slide transition starts
-    // Pause all videos to ensure smooth transition
-    pauseAllCarouselVideos();
-
-    // Start title change animation
-    const titleElement = document.getElementById("carousel-title");
-    if (titleElement) {
-      titleElement.classList.add("title-changing");
-    }
-  });
-
-  carousel.addEventListener("slid.bs.carousel", function (event) {
-    // This event fires after the slide transition completes
-    // Stop all videos except the active one to free up resources
-    stopAllCarouselVideos();
-
-    // Update title with animation
-    const activeIndex = Array.from(
-      event.target.querySelectorAll(".carousel-item")
-    ).indexOf(event.relatedTarget);
-    updateCarouselTitle(activeIndex);
-  });
-}
-
-// Function to update carousel title with animation
-function updateCarouselTitle(activeIndex) {
-  const titleElement = document.getElementById("carousel-title");
-  if (!titleElement || !carouselVideos[activeIndex]) return;
-
-  const newTitle = carouselVideos[activeIndex].title;
-
-  // If title is currently changing, update it
-  if (titleElement.classList.contains("title-changing")) {
-    // Wait for fade out, then change text and fade in
-    setTimeout(() => {
-      titleElement.textContent = newTitle;
-      titleElement.classList.remove("title-changing");
-      titleElement.classList.add("title-changed");
-
-      // Remove the title-changed class after animation
-      setTimeout(() => {
-        titleElement.classList.remove("title-changed");
-      }, 300);
-    }, 150); // Half of the transition duration
-  } else {
-    // Initial title set (no animation needed)
-    titleElement.textContent = newTitle;
-  }
-}
-
-// =============================================================================
-// VIDEO PREVIEW ON HOVER
-// =============================================================================
-
-function setupVideoPreview(cardElement, video) {
-  if (!video.path) return;
-
-  const iframe = cardElement.querySelector("iframe");
-  if (!iframe) return;
-
-  let hoverTimeout;
-  let leaveTimeout;
-  let isHovered = false;
-  let isPlaying = false;
-
-  cardElement.addEventListener("mouseenter", () => {
-    isHovered = true;
-    clearTimeout(leaveTimeout);
-
-    // Delay video start to avoid triggering on quick mouse movements
-    hoverTimeout = setTimeout(() => {
-      if (isHovered && !isPlaying) {
-        startVideoPreview(iframe, video);
-        isPlaying = true;
-      }
-    }, 700); // 700ms delay to avoid accidental triggers
-  });
-
-  cardElement.addEventListener("mouseleave", () => {
-    isHovered = false;
-    clearTimeout(hoverTimeout);
-
-    // Small delay before stopping to avoid flickering on quick mouse movements
-    leaveTimeout = setTimeout(() => {
-      if (!isHovered && isPlaying) {
-        stopVideoPreview(iframe, video);
-        isPlaying = false;
-      }
-    }, 100);
-  });
-}
-
-function startVideoPreview(iframe, video) {
-  try {
-    // Update src to enable autoplay with mute for preview
-    iframe.src = `https://www.youtube.com/embed/${video.path}?autoplay=1&mute=1&controls=0&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1&start=0`;
-  } catch (error) {
-    console.log("Could not start video preview:", error);
-  }
-}
-
-function stopVideoPreview(iframe, video) {
-  try {
-    // Reset to static preview (no autoplay, no loop)
-    iframe.src = `https://www.youtube.com/embed/${video.path}?mute=1&controls=0&loop=0&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
-  } catch (error) {
-    console.log("Could not stop video preview:", error);
-  }
-}
-
-// =============================================================================
-// VIDEO OVERLAY FUNCTIONALITY
-// =============================================================================
-
-function setupVideoOverlay() {
-  // Create video overlay HTML structure with fixed container
-  const overlayHTML = `
-    <div class="video-overlay" id="videoOverlay">
-      <div class="video-overlay-content">
-        <div class="video-overlay-close" id="overlayClose">×</div>
-        <div class="video-overlay-video-container" id="overlayVideoContainer"></div>
-        <div class="video-overlay-info" id="overlayInfo">
-          <h3 id="overlayTitle"></h3>
-          <p id="overlayTypes"></p>
-        </div>
+  /**
+   * Create empty state HTML
+   */
+  function createEmptyStateHTML(message) {
+    return `
+      <div class="empty-state">
+        <p>${escapeHtml(message)}</p>
       </div>
-    </div>
-  `;
-
-  // Add overlay to body
-  document.body.insertAdjacentHTML("beforeend", overlayHTML);
-
-  // Setup event listeners
-  const overlay = document.getElementById("videoOverlay");
-  const closeBtn = document.getElementById("overlayClose");
-
-  // Close overlay when clicking close button
-  closeBtn.addEventListener("click", closeVideoOverlay);
-
-  // Close overlay when clicking outside content
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-      closeVideoOverlay();
-    }
-  });
-
-  // Close overlay with Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && overlay.classList.contains("active")) {
-      closeVideoOverlay();
-    }
-  });
-}
-
-function openVideoOverlay(video) {
-  const overlay = document.getElementById("videoOverlay");
-  const container = document.getElementById("overlayVideoContainer");
-  const title = document.getElementById("overlayTitle");
-  const types = document.getElementById("overlayTypes");
-
-  // Set video info
-  title.textContent = video.title;
-  types.textContent = video.types.join(", ");
-
-  // Clear previous content
-  container.innerHTML = "";
-
-  // Create video content
-  if (video.path && video.path !== "") {
-    // Create YouTube iframe with larger size and better parameters
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${video.path}?autoplay=1&mute=0&controls=1&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
-    iframe.setAttribute("allowfullscreen", "");
-    iframe.setAttribute("frameborder", "0");
-    iframe.setAttribute("allow", "autoplay; encrypted-media");
-    iframe.setAttribute("id", `overlay-youtube-${video.path}`);
-    container.appendChild(iframe);
-  } else {
-    // Create placeholder for videos without path
-    const placeholder = document.createElement("div");
-    placeholder.className = "video-placeholder";
-
-    const placeholderImg = document.createElement("img");
-    placeholderImg.className = "placeholder-image";
-
-    // Set image based on trick type
-    switch (video.types[0]) {
-      case "NORMAL":
-        placeholderImg.src = "./images/normal.jpg";
-        break;
-      case "NOLLIE":
-        placeholderImg.src = "./images/nollie.jpg";
-        break;
-      case "FAKIE":
-        placeholderImg.src = "./images/fakie.jpg";
-        break;
-      case "SWITCH":
-        placeholderImg.src = "./images/switch.jpg";
-        break;
-      default:
-        placeholderImg.src = "./images/unknown.jpg";
-    }
-    placeholderImg.alt = video.title;
-
-    const placeholderText = document.createElement("div");
-    placeholderText.className = "placeholder-text";
-    placeholderText.innerHTML = `
-      <h3>${video.title}</h3>
-      <p>Video coming soon...</p>
-      <p>This trick is on the todo list!</p>
     `;
-
-    placeholder.appendChild(placeholderImg);
-    placeholder.appendChild(placeholderText);
-    container.appendChild(placeholder);
   }
 
-  // Store current video reference
-  currentOverlayVideo = video;
-
-  // Prevent body scrolling
-  document.body.classList.add("video-overlay-active");
-
-  // Show overlay with animation
-  overlay.classList.add("active");
-}
-
-function closeVideoOverlay() {
-  const overlay = document.getElementById("videoOverlay");
-
-  if (!overlay || !overlay.classList.contains("active")) {
-    return;
+  /**
+   * Debounce function
+   */
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func.apply(this, args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
   }
 
-  // Hide overlay
-  overlay.classList.remove("active");
+  /**
+   * XSS protection
+   */
+  function escapeHtml(text) {
+    if (typeof text !== "string") return "";
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
 
-  // Re-enable body scrolling
-  document.body.classList.remove("video-overlay-active");
+  /**
+   * Error handling
+   */
+  function handleError(message, error) {
+    console.error(`SkateApp Error: ${message}`, error);
 
-  // Stop any playing videos after animation completes
-  setTimeout(() => {
-    if (currentOverlayVideo && currentOverlayVideo.path) {
-      const iframe = document.getElementById(
-        `overlay-youtube-${currentOverlayVideo.path}`
-      );
-      if (iframe) {
-        // Stop the video by reloading the iframe src without autoplay
-        iframe.src = `https://www.youtube.com/embed/${currentOverlayVideo.path}?mute=1&controls=1&loop=1&vd=hd1080&enablejsapi=1&rel=0&modestbranding=1`;
-      }
-    }
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "alert alert-danger";
+    errorDiv.textContent = "Something went wrong. Please refresh the page.";
+    document.body.insertBefore(errorDiv, document.body.firstChild);
 
-    // Clear the container content
-    const container = document.getElementById("overlayVideoContainer");
-    if (container) {
-      container.innerHTML = "";
-    }
+    setTimeout(() => errorDiv.remove(), 5000);
+  }
 
-    // Clear current video reference
-    currentOverlayVideo = null;
-  }, 400); // Match the CSS transition duration
+  /**
+   * Cleanup for memory management
+   */
+  function cleanup() {
+    previewTimeouts.forEach((timeout) => clearTimeout(timeout));
+    previewTimeouts.clear();
+    pauseAllVideos();
+  }
+
+  // Public API
+  return { init };
+})();
+
+// Initialize when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", SkateApp.init);
+} else {
+  SkateApp.init();
 }
