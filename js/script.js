@@ -73,8 +73,10 @@ const SkateApp = (function () {
       "grindsGrid",
       "otherGrid",
       "dropdown-done",
+      "dropdown-to-shoot",
       "dropdown-todo",
       "trickDoneTitle",
+      "trickToShootTitle",
       "trickTodoTitle",
       "highlightedCarousel",
     ];
@@ -465,52 +467,72 @@ const SkateApp = (function () {
    * Render navigation dropdowns
    */
   function renderNavigationDropdowns() {
-    const videosWithPath = [];
-    const videosWithoutPath = [];
-
-    // Combine all videos from all JSON files
+    // Combine all videos from grinds.json, other.json and videos.json
     const allCombinedVideos = [
       ...state.allVideos,
       ...state.grindsVideos,
       ...state.otherVideos,
     ];
 
+    // Separate videos with and without paths
+    const tricksWithVideos = [];
+    const tricksToShoot = [];
+
     allCombinedVideos.forEach((video) => {
       if (video.path && video.path.trim() !== "") {
-        videosWithPath.push(video);
+        tricksWithVideos.push(video);
       } else {
-        videosWithoutPath.push(video);
+        tricksToShoot.push(video);
       }
     });
 
-    renderDropdown(elements.dropdownDone, videosWithPath);
-    renderDropdown(elements.dropdownTodo, videosWithoutPath);
+    // Render the three dropdowns
+    renderDropdown(elements.dropdownDone, tricksWithVideos);
+    renderDropdown(elements.dropdownToShoot, tricksToShoot);
+    renderDropdown(elements.dropdownTodo, state.todoTricks, true);
 
+    // Update titles with counts
     if (elements.trickDoneTitle) {
-      elements.trickDoneTitle.textContent = `Tricks Done (${videosWithPath.length})`;
+      elements.trickDoneTitle.textContent = `Tricks Done (${tricksWithVideos.length})`;
+    }
+    if (elements.trickToShootTitle) {
+      elements.trickToShootTitle.textContent = `Tricks to Shoot (${tricksToShoot.length})`;
     }
     if (elements.trickTodoTitle) {
-      elements.trickTodoTitle.textContent = `Tricks Todo (${videosWithoutPath.length})`;
+      elements.trickTodoTitle.textContent = `Tricks Todo (${state.todoTricks.length})`;
     }
   }
 
   /**
    * Render dropdown with document fragment
    */
-  function renderDropdown(dropdownElement, videos) {
+  function renderDropdown(dropdownElement, items, isTodo = false) {
     if (!dropdownElement) return;
 
     const fragment = document.createDocumentFragment();
 
-    videos.forEach((video) => {
+    items.forEach((item) => {
       const li = document.createElement("li");
       const button = document.createElement("button");
       button.className = "dropdown-item";
-      button.textContent = video.title;
-      button.addEventListener("click", () => {
-        openVideoOverlay(video);
-        scrollToVideoCard(video);
-      });
+
+      if (isTodo) {
+        // Todo items have 'name' property
+        button.textContent = item.name;
+        button.addEventListener("click", () => {
+          // For todo items, we can't open video overlay since they don't have videos
+          // Just close the sidebar
+          closeSidebar();
+        });
+      } else {
+        // Video items have 'title' property
+        button.textContent = item.title;
+        button.addEventListener("click", () => {
+          openVideoOverlay(item);
+          scrollToVideoCard(item);
+        });
+      }
+
       li.appendChild(button);
       fragment.appendChild(li);
     });
