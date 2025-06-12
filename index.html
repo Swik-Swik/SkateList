@@ -32,17 +32,6 @@
           Skate Tricks
         </a>
 
-        <!-- Search Form Centered -->
-        <form class="d-flex mx-auto" role="search">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-            id="search-bar"
-          />
-        </form>
-
         <!-- Right-aligned Menu Toggler -->
         <button
           class="navbar-toggler"
@@ -158,55 +147,65 @@
     <!-- Main Section with Tabs -->
     <main class="main-section">
       <div class="container">
-        <!-- Tab Navigation -->
-        <ul
-          class="nav nav-tabs justify-content-center mb-4"
-          id="trickTabs"
-          role="tablist"
-        >
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link active"
-              id="flat-tricks-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#flat-tricks"
-              type="button"
-              role="tab"
-              aria-controls="flat-tricks"
-              aria-selected="true"
-            >
-              Flat Tricks
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="grinds-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#grinds"
-              type="button"
-              role="tab"
-              aria-controls="grinds"
-              aria-selected="false"
-            >
-              Grinds
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="other-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#other"
-              type="button"
-              role="tab"
-              aria-controls="other"
-              aria-selected="false"
-            >
-              Other
-            </button>
-          </li>
-        </ul>
+        <!-- Search and Tabs Container -->
+        <div class="search-tabs-container mb-4">
+          <!-- Search Form positioned at same level as tabs -->
+          <form class="d-flex search-form" role="search">
+            <input
+              class="form-control"
+              type="search"
+              placeholder="Search tricks..."
+              aria-label="Search"
+              id="search-bar"
+            />
+          </form>
+
+          <!-- Tab Navigation -->
+          <ul class="nav nav-tabs" id="trickTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="flat-tricks-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#flat-tricks"
+                type="button"
+                role="tab"
+                aria-controls="flat-tricks"
+                aria-selected="true"
+              >
+                Flat Tricks
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="grinds-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#grinds"
+                type="button"
+                role="tab"
+                aria-controls="grinds"
+                aria-selected="false"
+              >
+                Grinds
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="other-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#other"
+                type="button"
+                role="tab"
+                aria-controls="other"
+                aria-selected="false"
+              >
+                Other
+              </button>
+            </li>
+          </ul>
+        </div>
 
         <!-- Tab Content -->
         <div class="tab-content" id="trickTabsContent">

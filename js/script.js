@@ -577,17 +577,17 @@ const SkateApp = (function () {
    */
   function setupVideoOverlay() {
     const overlayHTML = `
-      <div class="video-overlay" id="videoOverlay">
-        <div class="video-overlay-content">
+    <div class="video-overlay" id="videoOverlay">
+      <div class="video-overlay-content">
           <div class="video-overlay-close" id="overlayClose" aria-label="Close video overlay">&times;</div>
-          <div class="video-overlay-video-container" id="overlayVideoContainer"></div>
-          <div class="video-overlay-info" id="overlayInfo">
-            <h3 id="overlayTitle"></h3>
-            <p id="overlayTypes"></p>
-          </div>
+        <div class="video-overlay-video-container" id="overlayVideoContainer"></div>
+        <div class="video-overlay-info" id="overlayInfo">
+          <h3 id="overlayTitle"></h3>
+          <p id="overlayTypes"></p>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
     document.body.insertAdjacentHTML("beforeend", overlayHTML);
 
@@ -681,8 +681,8 @@ const SkateApp = (function () {
              loading="lazy">
         <div class="placeholder-text">
           <h3>${escapeHtml(video.title)}</h3>
-          <p>Video coming soon...</p>
-          <p>This trick is on the todo list!</p>
+      <p>Video coming soon...</p>
+      <p>This trick is on the todo list!</p>
         </div>
       </div>
     `;
